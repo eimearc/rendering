@@ -2,7 +2,6 @@
 # import the python renderman library
 import prman
 
-
 def Cube(width=1.0,height=1.0,depth=1.0) :	
 	w=width/2.0
 	h=height/2.0
@@ -28,6 +27,42 @@ def Cube(width=1.0,height=1.0,depth=1.0) :
 	ri.Patch("bilinear",{'P':face})
 	ri.ArchiveRecord(ri.COMMENT, '--End of Cube Function--')
 
+def Cubes():
+	ri = prman.Ri()
+	ri.TransformBegin() 
+	ri.Translate(-2,0,0)
+	ri.Rotate(25,0,1,0)
+	Cube()
+	ri.TransformEnd()
+	ri.TransformBegin() 
+	ri.Translate( 0,0,0)
+	ri.Rotate( 25,1,1,0)
+	ri.Skew(45.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0)
+	Cube(0.8,0.8,0.8)
+	ri.TransformEnd()
+	ri.TransformBegin() 
+	ri.Translate(2,0,0)
+	ri.Rotate(-25,1,1,1)
+	Cube(0.2,2,0.2)
+	ri.TransformEnd()
+
+def HullSubdiv() :
+	ri = prman.Ri()
+	s = 0.5
+	nverts = [4] * 1
+	verts = [
+		-s,-s,s, # front bottom left
+		s,-s,s,  # front bottom right
+		s,s,s,   # front top right
+		-s,s,s   # front top left
+	]
+	indices = [0,1,2,3]
+	ri.SubdivisionMesh("catmull-clark", nverts, indices, [ri.INTERPBOUNDARY], [0,0], [], [], {ri.P: verts})
+
+
+def Cylinder(radius=0.5, height=1.0) :
+	pass
+
 
 
 ri = prman.Ri() # create an instance of the RenderMan interface
@@ -48,23 +83,15 @@ ri.Projection(ri.PERSPECTIVE,{ri.FOV:50})
 
 # now we start our world
 ri.WorldBegin()
-
 ri.Translate(0,0,5)
-ri.TransformBegin() 
-ri.Translate(-2,0,0)
-ri.Rotate(25,0,1,0)
-Cube()
+#Cubes()
+ri.TransformBegin()
+ri.Translate(-1,0,0)
+HullSubdiv()
 ri.TransformEnd()
-ri.TransformBegin() 
-ri.Translate( 0,0,0)
-ri.Rotate( 25,1,1,0)
-ri.Skew(45.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0)
-Cube(0.8,0.8,0.8)
-ri.TransformEnd()
-ri.TransformBegin() 
-ri.Translate(2,0,0)
-ri.Rotate(-25,1,1,1)
-Cube(0.2,2,0.2);
+ri.TransformBegin()
+ri.Translate(1,0,0)
+HullSubdiv()
 ri.TransformEnd()
 
 ri.WorldEnd()
