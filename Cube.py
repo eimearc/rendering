@@ -73,6 +73,45 @@ def Table():
 	]
 	ri.Patch("bilinear", {'P':verts})
 
+class Model():
+	nverts = []
+	verts = []
+	indices = []
+	tags = []
+	edgeLoops = []
+	sharpness = []
+	nargs = []
+
+	def __init__(self):
+		print("model created")
+
+	def update(self, nverts, verts, indices, tags, edgeLoops, sharpness):
+		numverts = len(self.verts)/4
+		offset = numverts
+		print(numverts)
+		self.nverts = self.nverts + nverts
+		print("nverts:", self.nverts)
+		self.verts = self.verts + verts
+		print("Verts", self.verts)
+		for i in indices:
+			self.indices.append(i+offset)
+			# print("Added: ", i+offset)
+		print("Indices:", self.indices)
+		self.tags = self.tags + tags
+		if len(self.tags) > 0:
+			for i in range(0, len(self.tags)):
+				self.nargs = self.nargs + [5,1]
+		print("Tags:", self.tags)
+		for e in edgeLoops:
+			self.edgeLoops.append(e+offset)
+		print("Edge loops", self.edgeLoops)
+		self.sharpness = self.sharpness + sharpness
+		print("Sharpness", self.sharpness)
+
+	def draw(self):
+		ri.SubdivisionMesh("catmull-clark", self.nverts, self.indices, self.tags, self.nargs, self.edgeLoops, self.sharpness, {ri.P: self.verts})
+
+
 def CylinderBase(radius=0.5, height=1.0):
 	ri = prman.Ri()
 
@@ -96,9 +135,9 @@ def CylinderBase(radius=0.5, height=1.0):
 		x, y, -z
 	]
 
-	x = x*0.5
-	z = z*0.5
-	y = y-0.4
+	x = x*0.8
+	z = z*0.8
+	y = y-0.2
 	verts = verts + [
 		-x, y, -z,
 		-x, y, z,
@@ -119,11 +158,19 @@ def CylinderBase(radius=0.5, height=1.0):
 		11,7,4,8,
 		8,9,10,11
 	]
-	tags = []
-	nargs = [0,0]
-	intargs = []
-	sharpness = []
-	ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, intargs, sharpness, {ri.P: verts})
+	tags = [ri.CREASE, ri.CREASE]
+	# nargs = [5,1,5,1]
+	intargs = [
+		4,5,6,7,4,
+		8,9,10,11,8,
+	]
+	sharpness = [5,5]
+
+	model = Model()
+	model.update(nverts, verts, indices, tags, intargs, sharpness)
+	model.draw()
+
+	# ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, intargs, sharpness, {ri.P: verts})
 
 
 def Cylinder(radius=0.5, height=1.0) :
@@ -222,24 +269,24 @@ ri.Translate(0,-3,0)
 ri.Translate(0,0,20)
 ri.Rotate(-20,1,0,0)
 
-ri.TransformBegin()
-ri.Translate(-2,0,0)
-Cylinder(height=4.5, radius=2)
-ri.TransformEnd()
+# ri.TransformBegin()
+# ri.Translate(-2,0,0)
+# Cylinder(height=4.5, radius=2)
+# ri.TransformEnd()
 
-ri.TransformBegin()
-radius=2
-ri.Translate(2,radius,0)
-ri.Rotate(-90,1,0,0)
-Cylinder(height=5, radius=radius)
-ri.TransformEnd()
+# ri.TransformBegin()
+# radius=2
+# ri.Translate(2,radius,0)
+# ri.Rotate(-90,1,0,0)
+# Cylinder(height=5, radius=radius)
+# ri.TransformEnd()
 
-ri.TransformBegin()
-radius=2
-ri.Translate(6,radius,0)
-ri.Rotate(90,1,0,0)
-Cylinder(height=5, radius=radius)
-ri.TransformEnd()
+# ri.TransformBegin()
+# radius=2
+# ri.Translate(6,radius,0)
+# ri.Rotate(90,1,0,0)
+# Cylinder(height=5, radius=radius)
+# ri.TransformEnd()
 
 CylinderBase(height=5,radius=2)
 
