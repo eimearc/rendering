@@ -63,10 +63,12 @@ def HullSubdiv() :
 
 def Cylinder(radius=0.5, height=1.0) :
 	ri = prman.Ri()
-	nFaces = 13
+	nFaces = 14
 	nverts=[4]*nFaces
 	indices=[
-		0,1,2,3, # Bottom
+		# Bottom outside face
+		0,1,2,3,
+		# Outside faces
 		0,4,5,1,
 		1,5,6,2,
 		2,6,7,3,
@@ -76,10 +78,13 @@ def Cylinder(radius=0.5, height=1.0) :
 		5,9,10,6,
 		6,10,11,7,
 		7,11,8,4,
+		# Inside faces
 		8,12,13,9,
 		9,13,14,10,
 		10,14,15,11,
-		11,15,12,8
+		11,15,12,8,
+		# Bottom inside face
+		12,15,14,13
 	]
 	y=height
 	x=math.sqrt((radius*radius)/1.5)
@@ -96,7 +101,7 @@ def Cylinder(radius=0.5, height=1.0) :
 		x, y, z,
 		x, y, -z
 	]
-	lip = 0.8
+	lip = 0.9
 	x = x*lip
 	z = z*lip
 	top_verts_inside = [
@@ -105,17 +110,26 @@ def Cylinder(radius=0.5, height=1.0) :
 		x, y, z,
 		x, y, -z
 	]
+	depth = 0.1
 	bottom_verts_inside = [
-		-x, 0.1, -z,
-		-x, 0.1, z,
-		x, 0.1, z,
-		x, 0.1, -z
+		-x, depth, -z,
+		-x, depth, z,
+		x, depth, z,
+		x, depth, -z
 	]
 	verts=bottom_verts + top_verts + top_verts_inside + bottom_verts_inside
-	tags=[ri.CREASE,ri.CREASE]
-	nargs=[5,1,5,1] # number of args.
-	intargs=[0,1,2,3,0,4,5,6,7,4] # int args - the chain of verts that make up the edges (5 from the previous one)
-	sharpness=[10,10] # sharpness of creases (float args). If >= 10 infinite sharpness.
+
+	tags=[ri.CREASE,ri.CREASE,ri.CREASE,ri.CREASE]
+	nargs=[5,1,5,1,5,1,5,1] # number of args.
+	intargs=[  # int args - the chain of verts that make up the edges (5 from the previous one)
+		0,1,2,3,0,
+		4,5,6,7,4,
+		8,9,10,11,8,
+		12,13,14,15,12
+	]
+	sharp=2
+	bottom_sharp = 7
+	sharpness=[bottom_sharp,sharp,sharp,bottom_sharp] # sharpness of creases (float args). If >= 10 infinite sharpness.
 	ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, intargs, sharpness, {ri.P: verts})
 
 
@@ -143,7 +157,16 @@ ri.Translate(0,-3,0)
 ri.Translate(0,0,15)
 ri.Rotate(-20,1,0,0)
 
+ri.TransformBegin()
+ri.Translate(-2,0,0)
+Cylinder(height=4.5, radius=2)
+ri.TransformEnd()
+
+ri.TransformBegin()
+ri.Translate(2,0,0)
+ri.Rotate(-70,1,0,0)
 Cylinder(height=5, radius=2)
+ri.TransformEnd()
 
 ri.WorldEnd()
 ri.End()
