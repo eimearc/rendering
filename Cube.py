@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # import the python renderman library
 import prman
+import math
 
 def Cube(width=1.0,height=1.0,depth=1.0) :	
 	w=width/2.0
@@ -62,50 +63,60 @@ def HullSubdiv() :
 
 def Cylinder(radius=0.5, height=1.0) :
 	ri = prman.Ri()
-	# ri.TransformBegin()
-	# ri.Rotate(70,1,0,0)  # Rotate by 90 degrees around [1,0,0] x axis.
-	nverts=[4,4,4,4,4]
+	nFaces = 13
+	nverts=[4]*nFaces
 	indices=[
-		# 0,2,3,1,
-		# 4,6,7,5,
-		# 5,1,3,4,
-		# 2,0,7,6,
-		# 6,4,3,2,
-		# 1,5,7,0
-		0,1,2,3,
+		0,1,2,3, # Bottom
 		0,4,5,1,
 		1,5,6,2,
 		2,6,7,3,
-		3,7,4,0
+		3,7,4,0,
+		# Top faces
+		4,8,9,5,
+		5,9,10,6,
+		6,10,11,7,
+		7,11,8,4,
+		8,12,13,9,
+		9,13,14,10,
+		10,14,15,11,
+		11,15,12,8
 	]
 	y=height
-	x=radius*y
-	z=radius*y
-	verts=[
+	x=math.sqrt((radius*radius)/1.5)
+	z=x
+	bottom_verts = [
 		-x, 0, -z,
 		-x, 0, z,
 		x, 0, z,
-		x, 0, -z,
+		x, 0, -z
+	]
+	top_verts = [
 		-x, y, -z,
 		-x, y, z,
 		x, y, z,
-		x, y, -z,
-		# s,-s,-z, # 0
-		# s,s,-z,  # 1
-		# s,-s,z,  # 2
-		# s,s,z,   # 3
-		# -s,s,z,  # 4
-		# -s,s,-z, # 5
-		# -s,-s,z, # 6
-		# -s,-s,-z # 7
+		x, y, -z
 	]
+	lip = 0.8
+	x = x*lip
+	z = z*lip
+	top_verts_inside = [
+		-x, y, -z,
+		-x, y, z,
+		x, y, z,
+		x, y, -z
+	]
+	bottom_verts_inside = [
+		-x, 0.1, -z,
+		-x, 0.1, z,
+		x, 0.1, z,
+		x, 0.1, -z
+	]
+	verts=bottom_verts + top_verts + top_verts_inside + bottom_verts_inside
 	tags=[ri.CREASE,ri.CREASE]
 	nargs=[5,1,5,1] # number of args.
 	intargs=[0,1,2,3,0,4,5,6,7,4] # int args - the chain of verts that make up the edges (5 from the previous one)
 	sharpness=[10,10] # sharpness of creases (float args). If >= 10 infinite sharpness.
 	ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, intargs, sharpness, {ri.P: verts})
-
-	# ri.TransformEnd()
 
 
 
@@ -128,10 +139,11 @@ ri.Projection(ri.PERSPECTIVE,{ri.FOV:50})
 # now we start our world
 ri.WorldBegin()
 
-ri.Translate(0,-2,0)
-ri.Translate(0,0,10)
+ri.Translate(0,-3,0)
+ri.Translate(0,0,15)
 ri.Rotate(-20,1,0,0)
-Cylinder(height=4)
+
+Cylinder(height=5, radius=2)
 
 ri.WorldEnd()
 ri.End()
