@@ -281,6 +281,7 @@ def CreateEdgeLoop(startindex=0):
 def Cylinder2(radius=0.5, height=1.0):
 	X_BASE=math.sqrt((radius*radius)/1.5)
 	Z_BASE=X_BASE
+	LIP_HEIGHT=height*0.05
 
 	x=X_BASE*0.4
 	y=0
@@ -288,42 +289,41 @@ def Cylinder2(radius=0.5, height=1.0):
 	bottom_verts3 = Square(x,y,z)
 
 	x=X_BASE*0.4
-	y=0.1
+	y=LIP_HEIGHT/2
 	z=Z_BASE*0.4
 	bottom_verts4 = Square(x,y,z)
 
-	x=X_BASE*0.5
+	x=X_BASE*0.8
 	y=0
-	z=Z_BASE*0.5
+	z=Z_BASE*0.8
 	bottom_verts1 = Square(x,y,z)
 
-	x=X_BASE*0.8
-	y=0.1
-	z=Z_BASE*0.8
+	x=X_BASE*0.9
+	y=LIP_HEIGHT/2
+	z=Z_BASE*0.9
 	bottom_verts2 = Square(x,y,z)
 
-	verts = bottom_verts4 + bottom_verts3 + bottom_verts1 + bottom_verts2
-	
+	x=X_BASE
+	y=LIP_HEIGHT
+	z=Z_BASE
+	top_verts_1 = Square(x,y,z)
+
+	verts = bottom_verts4 + bottom_verts3 + bottom_verts1 + bottom_verts2 + top_verts_1
+
+	num = 4
+	edgeloops = []
 	indices = [
 		0,1,2,3
 	]
-	indices = indices + CreateFaceLoop(0) + CreateFaceLoop(1) + CreateFaceLoop(2)
-	print(indices)
-	nfaces = len(indices)/4
-	nverts = [4]*nfaces
-	print(nverts)
+	for i in range(num):
+		edgeloops = edgeloops + CreateEdgeLoop(i)
+		indices = indices + CreateFaceLoop(i)
 
-	edgeloops = CreateEdgeLoop(0) + CreateEdgeLoop(1) + CreateEdgeLoop(2)
-
-	num = 3
 	tags = [ri.CREASE]*num
 	nargs = [5,1]*num
-	floatargs = [10]*num
-
-	print(tags)
-	print(nargs)
-	print(edgeloops)
-	print(floatargs)
+	floatargs = [2]*num
+	nfaces = len(indices)/4
+	nverts = [4]*nfaces
 
 	ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, edgeloops, floatargs, {ri.P: verts})
 
@@ -354,7 +354,7 @@ ri.Rotate(-20,1,0,0)
 
 ri.TransformBegin()
 ri.Translate(-2,1,0)
-Cylinder2(height=4.5, radius=2)
+Cylinder2(height=10, radius=2)
 ri.TransformEnd()
 
 ri.TransformBegin()
