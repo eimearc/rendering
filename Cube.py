@@ -169,15 +169,7 @@ def CylinderBase(radius=0.5, height=1.0):
 	# model.draw()
 
 
-def Square(x,y,z):
-	return [
-		-x, y, -z,
-		-x, y, z,
-		x, y, z,
-		x, y, -z
-	]
-
-def Cylinder(radius=0.5, height=1.0) :
+def Cylinder2(radius=0.5, height=1.0) :
 	ri = prman.Ri()
 	indices=[
 		# Bottom base face
@@ -278,29 +270,37 @@ def CreateEdgeLoop(startindex=0):
 	edges = [i+(startindex*4) for i in edges]
 	return edges
 
-def Cylinder2(radius=0.5, height=1.0):
+def Square(x,y,z):
+	return [
+		-x, y, -z,
+		-x, y, z,
+		x, y, z,
+		x, y, -z
+	]
+
+def Cylinder(radius=0.5, height=1.0):
 	X_BASE=math.sqrt((radius*radius)/1.5)
 	Z_BASE=X_BASE
-	LIP_HEIGHT=height*0.05
+	LIP_HEIGHT=height*0.08
 
 	x=X_BASE*0.7
-	y=LIP_HEIGHT/2
+	y=LIP_HEIGHT*0.5
 	z=Z_BASE*0.7
 	bottom_verts_inner_top = Square(x,y,z)
-
-	x=X_BASE*0.7
-	y=0
-	z=Z_BASE*0.7
-	bottom_verts_inner_bottom = Square(x,y,z)
 
 	x=X_BASE*0.8
 	y=0
 	z=Z_BASE*0.8
-	bottom_verts_outer_bottom = Square(x,y,z)
+	bottom_verts_inner_bottom = Square(x,y,z)
 
 	x=X_BASE*0.9
-	y=LIP_HEIGHT/2
+	y=0
 	z=Z_BASE*0.9
+	bottom_verts_outer_bottom = Square(x,y,z)
+
+	x=X_BASE*0.95
+	y=LIP_HEIGHT*0.5
+	z=Z_BASE*0.95
 	bottom_verts_outer_middle = Square(x,y,z)
 
 	x=X_BASE
@@ -337,7 +337,7 @@ def Cylinder2(radius=0.5, height=1.0):
 		edgeloops = edgeloops + CreateEdgeLoop(i)
 		indices = indices + CreateFaceLoop(i)
 
-	print(indices)
+	# Add final face for inside bottom.
 	indices = indices + [29,28,31,30]
 	edgeloops = edgeloops + CreateEdgeLoop(7)
 	num = num+1
@@ -348,6 +348,7 @@ def Cylinder2(radius=0.5, height=1.0):
 	nfaces = len(indices)/4
 	nverts = [4]*nfaces
 
+	# Change crease for final edgeloop to be more crisp.
 	floatargs[num-1]=3
 
 	ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, edgeloops, floatargs, {ri.P: verts})
@@ -377,28 +378,27 @@ ri.Translate(0,-3,0)
 ri.Translate(0,0,20)
 ri.Rotate(-20,1,0,0)
 
+height = 4.5
+radius = 2
+
 ri.TransformBegin()
-ri.Translate(-2,1,0)
-Cylinder2(height=6, radius=2)
+ri.Translate(-6,1,0)
+Cylinder(height=height, radius=radius)
 ri.TransformEnd()
 
 ri.TransformBegin()
-radius=2
-ri.Translate(2,radius,0)
+ri.Translate(0,radius,0)
 ri.Rotate(-70,1,0,0)
-Cylinder2(height=5, radius=radius)
+Cylinder(height=height, radius=radius)
 ri.TransformEnd()
 
 ri.TransformBegin()
-radius=2
 ri.Translate(6,radius,0)
 ri.Rotate(90,1,0,0)
-Cylinder2(height=5, radius=radius)
+Cylinder(height=height, radius=radius)
 ri.TransformEnd()
 
-# CylinderBase(height=5,radius=2)
-
-# Table()
+Table()
 
 ri.WorldEnd()
 ri.End()
