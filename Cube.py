@@ -309,9 +309,19 @@ def Cylinder(radius=0.5, height=1.0):
 	bottom_verts_outer_top = Square(x,y,z)
 
 	x=X_BASE
+	y=height*0.9
+	z=Z_BASE
+	top_verts_outer_bottom = Square(x,y,z)
+
+	x=X_BASE*1.05
+	y=height*0.95
+	z=Z_BASE*1.05
+	top_verts_outer_middle = Square(x,y,z)
+
+	x=X_BASE
 	y=height
 	z=Z_BASE
-	top_verts_outer = Square(x,y,z)
+	top_verts_outer_top = Square(x,y,z)
 
 	x=X_BASE * 0.9
 	y=height
@@ -319,7 +329,7 @@ def Cylinder(radius=0.5, height=1.0):
 	top_verts_inner = Square(x,y,z)
 
 	bottom_verts_outer = bottom_verts_inner_top + bottom_verts_inner_bottom + bottom_verts_outer_bottom + bottom_verts_outer_middle + bottom_verts_outer_top
-	top_verts = top_verts_outer + top_verts_inner
+	top_verts = top_verts_outer_bottom + top_verts_outer_middle + top_verts_outer_top + top_verts_inner
 	
 	x=X_BASE*0.9
 	y=LIP_HEIGHT*2
@@ -328,7 +338,7 @@ def Cylinder(radius=0.5, height=1.0):
 
 	verts = bottom_verts_outer + top_verts + bottom_verts_inner
 
-	num = 7
+	num = 9
 	edgeloops = []
 	indices = [
 		0,1,2,3
@@ -338,8 +348,9 @@ def Cylinder(radius=0.5, height=1.0):
 		indices = indices + CreateFaceLoop(i)
 
 	# Add final face for inside bottom.
-	indices = indices + [29,28,31,30]
-	edgeloops = edgeloops + CreateEdgeLoop(7)
+	i = num*4
+	indices = indices + [i+1,i,i+3,i+2]
+	edgeloops = edgeloops + CreateEdgeLoop(num)
 	num = num+1
 
 	tags = [ri.CREASE]*num
