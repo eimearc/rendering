@@ -1,4 +1,4 @@
 {
     "python.pythonPath": "/opt/local/bin/python3.7",
-    "python.autoComplete.extraPaths": "/Applications/Pixar/RenderManProServer-23.2/bin"
+    "python.autoComplete.extraPaths": ["/Applications/Pixar/RenderManProServer-23.2/bin"]
 }

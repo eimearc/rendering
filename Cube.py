@@ -62,29 +62,50 @@ def HullSubdiv() :
 
 def Cylinder(radius=0.5, height=1.0) :
 	ri = prman.Ri()
-	ri.TransformBegin()
-	ri.Rotate(70,1,0,0)  # Rotate by 90 degrees around [1,0,0] x axis.
-	nverts=[4,4,4,4,4,4]
-	indices=[0,2,3,1,4,6,7,5,5,1,3,4,2,0,7,6,6,4,3,2,1,5,7,0]
-	s=2
-	z=1.5*s
+	# ri.TransformBegin()
+	# ri.Rotate(70,1,0,0)  # Rotate by 90 degrees around [1,0,0] x axis.
+	nverts=[4,4,4,4,4]
+	indices=[
+		# 0,2,3,1,
+		# 4,6,7,5,
+		# 5,1,3,4,
+		# 2,0,7,6,
+		# 6,4,3,2,
+		# 1,5,7,0
+		0,1,2,3,
+		0,4,5,1,
+		1,5,6,2,
+		2,6,7,3,
+		3,7,4,0
+	]
+	y=height
+	x=radius*y
+	z=radius*y
 	verts=[
-		s,-s,-z, # 0
-		s,s,-z,  # 1
-		s,-s,z,  # 2
-		s,s,z,   # 3
-		-s,s,z,  # 4
-		-s,s,-z, # 5
-		-s,-s,z, # 6
-		-s,-s,-z # 7
+		-x, 0, -z,
+		-x, 0, z,
+		x, 0, z,
+		x, 0, -z,
+		-x, y, -z,
+		-x, y, z,
+		x, y, z,
+		x, y, -z,
+		# s,-s,-z, # 0
+		# s,s,-z,  # 1
+		# s,-s,z,  # 2
+		# s,s,z,   # 3
+		# -s,s,z,  # 4
+		# -s,s,-z, # 5
+		# -s,-s,z, # 6
+		# -s,-s,-z # 7
 	]
 	tags=[ri.CREASE,ri.CREASE]
 	nargs=[5,1,5,1] # number of args.
-	intargs=[1,5,7,0,1,3,4,6,2,3] # int args - the chain of verts that make up the edges (5 from the previous one)
-	sharpness=[5,5] # sharpness of creases (float args). If >= 10 infinite sharpness.
+	intargs=[0,1,2,3,0,4,5,6,7,4] # int args - the chain of verts that make up the edges (5 from the previous one)
+	sharpness=[10,10] # sharpness of creases (float args). If >= 10 infinite sharpness.
 	ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, intargs, sharpness, {ri.P: verts})
 
-	ri.TransformEnd()
+	# ri.TransformEnd()
 
 
 
@@ -107,8 +128,10 @@ ri.Projection(ri.PERSPECTIVE,{ri.FOV:50})
 # now we start our world
 ri.WorldBegin()
 
+ri.Translate(0,-2,0)
 ri.Translate(0,0,10)
-Cylinder()
+ri.Rotate(-20,1,0,0)
+Cylinder(height=4)
 
 ri.WorldEnd()
 ri.End()
