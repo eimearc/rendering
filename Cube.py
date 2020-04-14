@@ -60,13 +60,26 @@ def HullSubdiv() :
 	indices = [0,1,2,3]
 	ri.SubdivisionMesh("catmull-clark", nverts, indices, [ri.INTERPBOUNDARY], [0,0], [], [], {ri.P: verts})
 
+def Table():
+	ri = prman.Ri()
+	x = 10
+	y = 0
+	z = x
+	verts = [
+		-x, y, -z,
+		-x, y, z,
+		x, y, -z,
+		x, y, z
+	]
+	ri.Patch("bilinear", {'P':verts})
+
 
 def Cylinder(radius=0.5, height=1.0) :
 	ri = prman.Ri()
 	nFaces = 14
 	nverts=[4]*nFaces
 	indices=[
-		# Bottom outside face
+		# Bottom base face
 		0,1,2,3,
 		# Outside faces
 		0,4,5,1,
@@ -148,13 +161,13 @@ ri.Display("Cube.exr", "it", "rgba")
 # Specify PAL resolution 1:1 pixel Aspect ratio
 ri.Format(720,576,1)
 # now set the projection to perspective
-ri.Projection(ri.PERSPECTIVE,{ri.FOV:50}) 
+ri.Projection(ri.PERSPECTIVE,{ri.FOV:40}) 
 
 # now we start our world
 ri.WorldBegin()
 
 ri.Translate(0,-3,0)
-ri.Translate(0,0,15)
+ri.Translate(0,0,20)
 ri.Rotate(-20,1,0,0)
 
 ri.TransformBegin()
@@ -163,10 +176,13 @@ Cylinder(height=4.5, radius=2)
 ri.TransformEnd()
 
 ri.TransformBegin()
-ri.Translate(2,0,0)
-ri.Rotate(-70,1,0,0)
-Cylinder(height=5, radius=2)
+radius=2
+ri.Translate(2,radius,0)
+ri.Rotate(-90,1,0,0)
+Cylinder(height=5, radius=radius)
 ri.TransformEnd()
+
+Table()
 
 ri.WorldEnd()
 ri.End()
