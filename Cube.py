@@ -73,6 +73,58 @@ def Table():
 	]
 	ri.Patch("bilinear", {'P':verts})
 
+def CylinderBase(radius=0.5, height=1.0):
+	ri = prman.Ri()
+
+	y=1
+	x=math.sqrt((radius*radius)/1.5)
+	z=x
+	verts = [
+		-x, y, -z,
+		-x, y, z,
+		x, y, z,
+		x, y, -z
+	]
+
+	x = x*0.9
+	z = z*0.9
+	y = y-0.1
+	verts = verts + [
+		-x, y, -z,
+		-x, y, z,
+		x, y, z,
+		x, y, -z
+	]
+
+	x = x*0.5
+	z = z*0.5
+	y = y-0.4
+	verts = verts + [
+		-x, y, -z,
+		-x, y, z,
+		x, y, z,
+		x, y, -z
+	]
+
+	nFaces = 9
+	nverts = [4]*nFaces
+	indices = [
+		4,0,1,5,
+		5,1,2,6,
+		6,2,3,7,
+		7,3,0,4,
+		8,4,5,9,
+		9,5,6,10,
+		10,6,7,11,
+		11,7,4,8,
+		8,9,10,11
+	]
+	tags = []
+	nargs = [0,0]
+	intargs = []
+	sharpness = []
+	ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, intargs, sharpness, {ri.P: verts})
+
 
 def Cylinder(radius=0.5, height=1.0) :
 	ri = prman.Ri()
@@ -141,7 +193,7 @@ def Cylinder(radius=0.5, height=1.0) :
 		12,13,14,15,12
 	]
 	sharp=2
-	bottom_sharp = 7
+	bottom_sharp = 10
 	sharpness=[bottom_sharp,sharp,sharp,bottom_sharp] # sharpness of creases (float args). If >= 10 infinite sharpness.
 	ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, intargs, sharpness, {ri.P: verts})
 
@@ -181,6 +233,15 @@ ri.Translate(2,radius,0)
 ri.Rotate(-90,1,0,0)
 Cylinder(height=5, radius=radius)
 ri.TransformEnd()
+
+ri.TransformBegin()
+radius=2
+ri.Translate(6,radius,0)
+ri.Rotate(90,1,0,0)
+Cylinder(height=5, radius=radius)
+ri.TransformEnd()
+
+CylinderBase(height=5,radius=2)
 
 Table()
 
