@@ -283,34 +283,52 @@ def Cylinder2(radius=0.5, height=1.0):
 	Z_BASE=X_BASE
 	LIP_HEIGHT=height*0.05
 
-	x=X_BASE*0.4
-	y=0
-	z=Z_BASE*0.4
-	bottom_verts3 = Square(x,y,z)
-
-	x=X_BASE*0.4
+	x=X_BASE*0.7
 	y=LIP_HEIGHT/2
-	z=Z_BASE*0.4
-	bottom_verts4 = Square(x,y,z)
+	z=Z_BASE*0.7
+	bottom_verts_inner_top = Square(x,y,z)
+
+	x=X_BASE*0.7
+	y=0
+	z=Z_BASE*0.7
+	bottom_verts_inner_bottom = Square(x,y,z)
 
 	x=X_BASE*0.8
 	y=0
 	z=Z_BASE*0.8
-	bottom_verts1 = Square(x,y,z)
+	bottom_verts_outer_bottom = Square(x,y,z)
 
 	x=X_BASE*0.9
 	y=LIP_HEIGHT/2
 	z=Z_BASE*0.9
-	bottom_verts2 = Square(x,y,z)
+	bottom_verts_outer_middle = Square(x,y,z)
 
 	x=X_BASE
 	y=LIP_HEIGHT
 	z=Z_BASE
-	top_verts_1 = Square(x,y,z)
+	bottom_verts_outer_top = Square(x,y,z)
 
-	verts = bottom_verts4 + bottom_verts3 + bottom_verts1 + bottom_verts2 + top_verts_1
+	x=X_BASE
+	y=height
+	z=Z_BASE
+	top_verts_outer = Square(x,y,z)
 
-	num = 4
+	x=X_BASE * 0.9
+	y=height
+	z=Z_BASE * 0.9
+	top_verts_inner = Square(x,y,z)
+
+	bottom_verts_outer = bottom_verts_inner_top + bottom_verts_inner_bottom + bottom_verts_outer_bottom + bottom_verts_outer_middle + bottom_verts_outer_top
+	top_verts = top_verts_outer + top_verts_inner
+	
+	x=X_BASE*0.9
+	y=LIP_HEIGHT*2
+	z=Z_BASE*0.9
+	bottom_verts_inner = Square(x,y,z)
+
+	verts = bottom_verts_outer + top_verts + bottom_verts_inner
+
+	num = 7
 	edgeloops = []
 	indices = [
 		0,1,2,3
@@ -319,11 +337,18 @@ def Cylinder2(radius=0.5, height=1.0):
 		edgeloops = edgeloops + CreateEdgeLoop(i)
 		indices = indices + CreateFaceLoop(i)
 
+	print(indices)
+	indices = indices + [29,28,31,30]
+	edgeloops = edgeloops + CreateEdgeLoop(7)
+	num = num+1
+
 	tags = [ri.CREASE]*num
 	nargs = [5,1]*num
 	floatargs = [2]*num
 	nfaces = len(indices)/4
 	nverts = [4]*nfaces
+
+	floatargs[num-1]=3
 
 	ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, edgeloops, floatargs, {ri.P: verts})
 
@@ -354,13 +379,13 @@ ri.Rotate(-20,1,0,0)
 
 ri.TransformBegin()
 ri.Translate(-2,1,0)
-Cylinder2(height=10, radius=2)
+Cylinder2(height=6, radius=2)
 ri.TransformEnd()
 
 ri.TransformBegin()
 radius=2
 ri.Translate(2,radius,0)
-ri.Rotate(-90,1,0,0)
+ri.Rotate(-70,1,0,0)
 Cylinder2(height=5, radius=radius)
 ri.TransformEnd()
 
