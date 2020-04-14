@@ -355,7 +355,7 @@ def Cylinder(radius=0.5, height=1.0):
 
 	tags = [ri.CREASE]*num
 	nargs = [5,1]*num
-	floatargs = [2]*num
+	floatargs = [1]*num
 	nfaces = len(indices)/4
 	nverts = [4]*nfaces
 
