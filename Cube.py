@@ -280,6 +280,7 @@ def Square(x,y,z):
 
 class Verts():
 	verts = []
+	indices = []
 	y = 0.0
 	index = 0
 	edge_loop = []
@@ -290,12 +291,14 @@ class Verts():
 		self.y = y
 		self.verts = Square(x,y,z)
 		self.index = index
+		self.indices = [(index*4 + i) for i in [0,1,2,3]]
 		self.edge_loop = [(index*4 + i) for i in [0,1,2,3,0]]
 		self.sharpness = sharpness
 
 	def __str__(self):
 		return str("Verts\n") + \
 			"\tverts: " + str(self.verts) + \
+			"\n\tindices: " + str(self.indices) + \
 			"\n\ty: " + str(self.y) + \
 			"\n\tindex: " + str(self.index) + \
 			"\n\tedge_loop: " + str(self.edge_loop) + \
@@ -360,11 +363,13 @@ def Cylinder(radius=0.5, height=1.0):
 	z=Z_BASE*1.05
 	top_verts_outer_middle_top = Square(x,y,z)
 
+	# 8
 	x=X_BASE
 	y=height
 	z=Z_BASE
 	top_verts_outer_top = Square(x,y,z)
 
+	# 9
 	x=X_BASE * 0.9
 	y=height
 	z=Z_BASE * 0.9
@@ -387,12 +392,13 @@ def Cylinder(radius=0.5, height=1.0):
 
 	all_verts = [item for sublist in verts_list for item in sublist]
 	
+	# 10
 	x=X_BASE*0.9
 	y=LIP_HEIGHT*2
 	z=Z_BASE*0.9
-	bottom_verts_inner = Square(x,y,z)
+	bottom_verts_inner_test = Verts(x,y,z,10,3)
 
-	verts = all_verts + bottom_verts_inner
+	verts = all_verts + bottom_verts_inner_test.verts
 	
 
 	num = len(verts_list)
@@ -417,7 +423,8 @@ def Cylinder(radius=0.5, height=1.0):
 	nverts = [4]*nfaces
 
 	# Change crease for final edgeloop to be more crisp.
-	floatargs[num-1]=3
+	# floatargs[num-1]=3
+	floatargs[bottom_verts_inner_test.index] = bottom_verts_inner_test.sharpness
 	floatargs[6]=0.1
 	floatargs[7]=0.1
 
