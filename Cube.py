@@ -310,82 +310,79 @@ def Cylinder(radius=0.5, height=1.0):
 	Z_BASE=X_BASE
 	LIP_HEIGHT=height*0.08
 
+	DEFAULT_SHARPNESS=2.0
+
 	# 0
 	x=X_BASE*0.7
 	y=LIP_HEIGHT*0.5
 	z=Z_BASE*0.7
-	bottom_verts_inner_top = Square(x,y,z)
-
-	test1 = Verts(x,y,z,0,1.0)
-	test2 = Verts(x,y,z,1,1.0)
-	print(test1)
-	print(test2)
+	bottom_verts_inner_top = Verts(x,y,z,0,DEFAULT_SHARPNESS)
 
 	# 1
 	x=X_BASE*0.8
 	y=0
 	z=Z_BASE*0.8
-	bottom_verts_inner_bottom = Square(x,y,z)
+	bottom_verts_inner_bottom = Verts(x,y,z,1,DEFAULT_SHARPNESS)
 
 	# 2
 	x=X_BASE*0.9
 	y=0
 	z=Z_BASE*0.9
-	bottom_verts_outer_bottom = Square(x,y,z)
+	bottom_verts_outer_bottom = Verts(x,y,z,2,DEFAULT_SHARPNESS)
 
 	# 3
 	x=X_BASE*0.95
 	y=LIP_HEIGHT*0.5
 	z=Z_BASE*0.95
-	bottom_verts_outer_middle = Square(x,y,z)
+	bottom_verts_outer_middle = Verts(x,y,z,3,DEFAULT_SHARPNESS)
 
 	# 4
 	x=X_BASE
 	y=LIP_HEIGHT
 	z=Z_BASE
-	bottom_verts_outer_top = Square(x,y,z)
+	bottom_verts_outer_top = Verts(x,y,z,4,DEFAULT_SHARPNESS)
 
 	# 5
 	x=X_BASE
 	y=height*0.8
 	z=Z_BASE
-	top_verts_outer_bottom = Square(x,y,z)
+	top_verts_outer_bottom = Verts(x,y,z,5,DEFAULT_SHARPNESS)
 
 	# 6
 	x=X_BASE
 	y=height*0.9
 	z=Z_BASE
-	top_verts_outer_middle_bottom = Square(x,y,z)
+	top_verts_outer_middle_bottom = Verts(x,y,z,6,DEFAULT_SHARPNESS)
 
 	# 7
 	x=X_BASE*1.05
 	y=height*0.95
 	z=Z_BASE*1.05
-	top_verts_outer_middle_top = Square(x,y,z)
+	top_verts_outer_middle_top = Verts(x,y,z,7,DEFAULT_SHARPNESS)
 
 	# 8
 	x=X_BASE
 	y=height
 	z=Z_BASE
-	top_verts_outer_top = Square(x,y,z)
+	top_verts_outer_top = Verts(x,y,z,8,DEFAULT_SHARPNESS)
 
 	# 9
 	x=X_BASE * 0.9
 	y=height
 	z=Z_BASE * 0.9
-	top_verts_inner = Square(x,y,z)
+	top_verts_inner = Verts(x,y,z,9,DEFAULT_SHARPNESS)
 	
 	verts_list = [
-		bottom_verts_inner_top,
-		bottom_verts_inner_bottom,
-		bottom_verts_outer_bottom,
-		bottom_verts_outer_middle,
-		bottom_verts_outer_top,
-		top_verts_outer_bottom,
-		top_verts_outer_middle_bottom,
-		top_verts_outer_middle_top,
-		top_verts_outer_top,
-		top_verts_inner
+		bottom_verts_inner_top.verts,
+		bottom_verts_inner_bottom.verts,
+		bottom_verts_outer_bottom.verts,
+		bottom_verts_outer_middle.verts,
+		bottom_verts_outer_top.verts,
+		top_verts_outer_bottom.verts,
+		top_verts_outer_middle_bottom.verts,
+		top_verts_outer_middle_top.verts,
+		top_verts_outer_top.verts,
+		top_verts_inner.verts
 	]
 
 	all_verts = [item for sublist in verts_list for item in sublist]
