@@ -352,74 +352,71 @@ def Cylinder(radius=0.5, height=1.0):
 	x=X_BASE
 	y=height*0.9
 	z=Z_BASE
-	top_verts_outer_middle_bottom = Verts(x,y,z,6,DEFAULT_SHARPNESS)
+	top_verts_outer_middle_bottom = Verts(x,y,z,6,0.1)
 
 	# 7
 	x=X_BASE*1.05
 	y=height*0.95
 	z=Z_BASE*1.05
-	top_verts_outer_middle_top = Verts(x,y,z,7,DEFAULT_SHARPNESS)
+	top_verts_outer_middle_top = Verts(x,y,z,7,0.1)
 
 	# 8
 	x=X_BASE
 	y=height
 	z=Z_BASE
-	top_verts_outer_top = Verts(x,y,z,8,DEFAULT_SHARPNESS)
+	top_verts_outer_top = Verts(x,y,z,8,0.1)
 
 	# 9
 	x=X_BASE * 0.9
 	y=height
 	z=Z_BASE * 0.9
 	top_verts_inner = Verts(x,y,z,9,DEFAULT_SHARPNESS)
-	
-	verts_list = [
-		bottom_verts_inner_top.verts,
-		bottom_verts_inner_bottom.verts,
-		bottom_verts_outer_bottom.verts,
-		bottom_verts_outer_middle.verts,
-		bottom_verts_outer_top.verts,
-		top_verts_outer_bottom.verts,
-		top_verts_outer_middle_bottom.verts,
-		top_verts_outer_middle_top.verts,
-		top_verts_outer_top.verts,
-		top_verts_inner.verts
-	]
 
-	all_verts = [item for sublist in verts_list for item in sublist]
-	
 	# 10
 	x=X_BASE*0.9
 	y=LIP_HEIGHT*2
 	z=Z_BASE*0.9
 	bottom_verts_inner = Verts(x,y,z,10,3)
+	
+	verts_list = [
+		bottom_verts_inner_top,
+		bottom_verts_inner_bottom,
+		bottom_verts_outer_bottom,
+		bottom_verts_outer_middle,
+		bottom_verts_outer_top,
+		top_verts_outer_bottom,
+		top_verts_outer_middle_bottom,
+		top_verts_outer_middle_top,
+		top_verts_outer_top,
+		top_verts_inner,
+		bottom_verts_inner
+	]
 
-	verts = all_verts + bottom_verts_inner.verts
+	verts = []
+	edgeloops = []
+	for sublist in verts_list:
+		verts = verts + sublist.verts
+		edgeloops = edgeloops + sublist.edge_loop
 
 	num = 10
-	edgeloops = []
 	indices = [
 		0,1,2,3
 	]
-	for i in range(num):
-		edgeloops = edgeloops + CreateEdgeLoop(i)
+	for i in range(len(verts_list)-1):
 		indices = indices + CreateFaceLoop(i)
 
 	# Add final face for inside bottom.
-	i = num*4
+	i = bottom_verts_inner.index * 4
 	indices = indices + [i+1,i,i+3,i+2]
-	edgeloops = edgeloops + bottom_verts_inner.edge_loop
-	num = 11
 
+	num = len(verts_list)
 	tags = [ri.CREASE]*num
 	nargs = [5,1]*num
-	floatargs = [2]*num
+	floatargs = []
+	for sublist in verts_list:
+		floatargs.append(sublist.sharpness)
 	nfaces = len(indices)/4
 	nverts = [4]*nfaces
-
-	# Change crease for final edgeloop to be more crisp.
-	floatargs[bottom_verts_inner.index] = bottom_verts_inner.sharpness
-	floatargs[6]=0.1
-	floatargs[7]=0.1
 
 	ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, edgeloops, floatargs, {ri.P: verts})
 
