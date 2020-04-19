@@ -278,7 +278,29 @@ def Square(x,y,z):
 		x, y, -z
 	]
 
+class Verts():
+	verts = []
+	y = 0.0
+	index = 0
+	edge_loop = []
+	sharpness = 0.0
 
+	def __init__(self, x, y, z, index, sharpness):
+		self.index = index
+		self.y = y
+		self.verts = Square(x,y,z)
+		self.index = index
+		self.edge_loop = [(index*4 + i) for i in [0,1,2,3,0]]
+		self.sharpness = sharpness
+
+	def __str__(self):
+		return str("Verts\n") + \
+			"\tverts: " + str(self.verts) + \
+			"\n\ty: " + str(self.y) + \
+			"\n\tindex: " + str(self.index) + \
+			"\n\tedge_loop: " + str(self.edge_loop) + \
+			"\n\tsharpness: " + str(self.sharpness)
+		
 
 def Cylinder(radius=0.5, height=1.0):
 	X_BASE=math.sqrt((radius*radius)/1.5)
@@ -290,6 +312,11 @@ def Cylinder(radius=0.5, height=1.0):
 	y=LIP_HEIGHT*0.5
 	z=Z_BASE*0.7
 	bottom_verts_inner_top = Square(x,y,z)
+
+	test1 = Verts(x,y,z,0,1.0)
+	test2 = Verts(x,y,z,1,1.0)
+	print(test1)
+	print(test2)
 
 	# 1
 	x=X_BASE*0.8
