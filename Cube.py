@@ -392,11 +392,8 @@ def Cylinder(radius=0.5, height=1.0):
 		bottom_verts_inner
 	]
 
-	verts = []
-	edgeloops = []
-	for sublist in verts_list:
-		verts = verts + sublist.verts
-		edgeloops = edgeloops + sublist.edge_loop
+	edgeloops  = [val for sublist in verts_list for val in sublist.edge_loop]
+	verts = [val for sublist in verts_list for val in sublist.verts]
 
 	num = 10
 	indices = [
@@ -415,6 +412,8 @@ def Cylinder(radius=0.5, height=1.0):
 	floatargs = []
 	for sublist in verts_list:
 		floatargs.append(sublist.sharpness)
+
+	# floatargs = [verts.sharpness for verts in verts_list]
 	nfaces = len(indices)/4
 	nverts = [4]*nfaces
 
