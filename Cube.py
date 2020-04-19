@@ -310,7 +310,7 @@ def Cylinder(radius=0.5, height=1.0):
 	Z_BASE=X_BASE
 	LIP_HEIGHT=height*0.08
 
-	DEFAULT_SHARPNESS=2.0
+	DEFAULT_SHARPNESS=1.85
 
 	# 0
 	x=X_BASE*0.7
