@@ -345,15 +345,30 @@ def Cylinder(radius=0.5, height=1.0):
 
 	bottom_verts_outer = bottom_verts_inner_top + bottom_verts_inner_bottom + bottom_verts_outer_bottom + bottom_verts_outer_middle + bottom_verts_outer_top
 	top_verts = top_verts_outer_bottom + top_verts_outer_middle_bottom + top_verts_outer_middle_top + top_verts_outer_top + top_verts_inner
+	verts_list = [
+		bottom_verts_inner_top,
+		bottom_verts_inner_bottom,
+		bottom_verts_outer_bottom,
+		bottom_verts_outer_middle,
+		bottom_verts_outer_top,
+		top_verts_outer_bottom,
+		top_verts_outer_middle_bottom,
+		top_verts_outer_middle_top,
+		top_verts_outer_top,
+		top_verts_inner
+	]
+
+	all_verts = [item for sublist in verts_list for item in sublist]
 	
 	x=X_BASE*0.9
 	y=LIP_HEIGHT*2
 	z=Z_BASE*0.9
 	bottom_verts_inner = Square(x,y,z)
 
-	verts = bottom_verts_outer + top_verts + bottom_verts_inner
+	verts = all_verts + bottom_verts_inner
+	
 
-	num = 10
+	num = len(verts_list)
 	edgeloops = []
 	indices = [
 		0,1,2,3
