@@ -278,40 +278,48 @@ def Square(x,y,z):
 		x, y, -z
 	]
 
+
+
 def Cylinder(radius=0.5, height=1.0):
 	X_BASE=math.sqrt((radius*radius)/1.5)
 	Z_BASE=X_BASE
 	LIP_HEIGHT=height*0.08
 
+	# 0
 	x=X_BASE*0.7
 	y=LIP_HEIGHT*0.5
 	z=Z_BASE*0.7
 	bottom_verts_inner_top = Square(x,y,z)
 
+	# 1
 	x=X_BASE*0.8
 	y=0
 	z=Z_BASE*0.8
 	bottom_verts_inner_bottom = Square(x,y,z)
 
+	# 2
 	x=X_BASE*0.9
 	y=0
 	z=Z_BASE*0.9
 	bottom_verts_outer_bottom = Square(x,y,z)
 
+	# 3
 	x=X_BASE*0.95
 	y=LIP_HEIGHT*0.5
 	z=Z_BASE*0.95
 	bottom_verts_outer_middle = Square(x,y,z)
 
+	# 4
 	x=X_BASE
 	y=LIP_HEIGHT
 	z=Z_BASE
 	bottom_verts_outer_top = Square(x,y,z)
 
+	# 5
 	x=X_BASE
 	y=height*0.9
 	z=Z_BASE
-	top_verts_outer_bottom = Square(x,y,z)
+	top_verts_outer_bottom = Square(x,y,z) # Needs to be smoother
 
 	x=X_BASE*1.05
 	y=height*0.95
@@ -355,12 +363,13 @@ def Cylinder(radius=0.5, height=1.0):
 
 	tags = [ri.CREASE]*num
 	nargs = [5,1]*num
-	floatargs = [1]*num
+	floatargs = [2]*num
 	nfaces = len(indices)/4
 	nverts = [4]*nfaces
 
 	# Change crease for final edgeloop to be more crisp.
 	floatargs[num-1]=3
+	floatargs[6]=0.1
 
 	ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, edgeloops, floatargs, {ri.P: verts})
 
