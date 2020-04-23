@@ -33,9 +33,9 @@ def CreateEdgeLoop(startindex=0):
 def Square(x,y,z):
 	return [
 		-x, y, -z,
-		-x, y, z,
+		x, y, -z,
 		x, y, z,
-		x, y, -z
+		-x, y, z
 	]
 
 class Verts():
@@ -224,21 +224,21 @@ def MultipleCyliders():
 
 	ri.AttributeBegin()
 	ri.Attribute( 'identifier',{ 'name' :'cylinders'})
-	ri.Bxdf( 'PxrDisney','ceramic', { 'color baseColor' : [ 0.8, 0.8, 0.8] })
-	# ri.Bxdf('PxrSurface', 'plastic',{
-    #       'color diffuseColor' : [1, 1, 1],
-    #       'color clearcoatFaceColor' : [.5, .5, .5], 
-    #       'color clearcoatEdgeColor' : [.25, .25, .25]
+	# ri.Bxdf( 'PxrDisney','ceramic', {
+	# 	'color baseColor' : [ 0.8, 0.8, 0.8],
+	# 	'float specularRoughness': [0.01],
 	# })
-	# ri.Bxdf('PxrSurface', 'metal', {
-    #       'float diffuseGain' : [0],
-    #       'int specularFresnelMode' : [1],
-    #       'color specularEdgeColor' : [1 ,1 ,1],
-    #       'color specularIor' : [4.3696842, 2.916713, 1.654698],
-    #       'color specularExtinctionCoeff' : [5.20643, 4.2313662, 3.7549689],
-    #       'float specularRoughness' : [0.1], 
-    #       'integer specularModelType' : [1] 
-  	# })
+	ri.Bxdf('PxrSurface', 'greenglass',{ 
+		'color refractionColor' : [0,0.9,0],
+		'color diffuseColor' : [1, 1, 1],
+		'float diffuseGain' : 0,
+		'color specularEdgeColor' : [0.2, 1 ,0.2],
+		'float refractionGain' : [1.0],
+		'float reflectionGain' : [1.0],
+		'float glassRoughness' : [0.01],
+		'float glassIor' : [1.5],
+		'color extinction' : [0.0, 0.2 ,0.0],	
+	})
 	ri.TransformBegin()
 	ri.Translate(-6,0,0)
 	Cylinder(height=height, radius=radius)
@@ -265,7 +265,7 @@ filename = "Cube.rib"
 # make RI calls after this function else we get a core dump
 ri.Begin("__render") #filename)
 ri.Integrator ('PxrPathTracer' ,'integrator')
-# ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "shaded"})
+# ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "normals"}, {"normalCheck": 1})
 ri.Option('searchpath', {'string texture':'./textures/:@'})
 ri.Hider('raytrace' ,{'int incremental' :[1]})
 ri.ShadingRate(10)
@@ -297,6 +297,32 @@ ri.Light( 'PxrDomeLight', 'domeLight', {
   })
 ri.AttributeEnd()
 ri.TransformEnd()
+
+# height = 4.5
+# radius = 2
+
+# ri.AttributeBegin()
+# ri.Attribute( 'identifier',{ 'name' :'cylinder'})
+# # ri.Bxdf( 'PxrDisney','ceramic', {
+# # 	'color baseColor' : [ 0.8, 0.8, 0.8],
+# # 	'float specularRoughness': [0.01],
+# # })
+# ri.Bxdf('PxrSurface', 'greenglass',{ 
+# 	'color refractionColor' : [0,0.9,0],
+# 	'color diffuseColor' : [1, 1, 1],
+# 	'float diffuseGain' : 0,
+# 	'color specularEdgeColor' : [0.2, 1 ,0.2],
+# 	'float refractionGain' : [1.0],
+# 	'float reflectionGain' : [1.0],
+# 	'float glassRoughness' : [0.01],
+# 	'float glassIor' : [1.5],
+# 	'color extinction' : [0.0, 0.2 ,0.0],	
+# })
+# ri.TransformBegin()
+# ri.Translate(0,0,0)
+# Cylinder(height=height, radius=radius)
+# ri.TransformEnd()
+# ri.AttributeEnd()
 
 MultipleCyliders()
 Table()
