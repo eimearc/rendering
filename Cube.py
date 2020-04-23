@@ -70,10 +70,7 @@ def Cylinder(radius=0.5, height=1.0):
 	LIP_HEIGHT=height*0.08
 
 	DEFAULT_SHARPNESS=1.85
-	# DEFAULT_SHARPNESS=10
-
 	i = 0
-
 	# 0
 	x=X_BASE*0.5
 	y=LIP_HEIGHT*0.25
@@ -171,11 +168,17 @@ def Cylinder(radius=0.5, height=1.0):
 	middle_verts_inner = Verts(x,y,z,i,DEFAULT_SHARPNESS)
 	i += 1
 
-	# 12
 	x=X_BASE*0.85
 	y=LIP_HEIGHT*2
 	z=Z_BASE*0.85
-	bottom_verts_inner = Verts(x,y,z,i,3)
+	bottom_verts_inner_middle = Verts(x,y,z,i,3)
+	i += 1
+
+	# 12
+	x=X_BASE*0.5
+	y=LIP_HEIGHT*2
+	z=Z_BASE*0.5
+	bottom_verts_inner_center = Verts(x,y,z,i,0)
 	i += 1
 	
 	verts_list = [
@@ -193,7 +196,8 @@ def Cylinder(radius=0.5, height=1.0):
 		top_verts_outer_top,
 		top_verts_inner,
 		middle_verts_inner,
-		bottom_verts_inner
+		bottom_verts_inner_middle,
+		bottom_verts_inner_center
 	]
 
 	edgeloops  = [val for sublist in verts_list for val in sublist.edge_loop]
@@ -206,7 +210,7 @@ def Cylinder(radius=0.5, height=1.0):
 		indices = indices + CreateFaceLoop(i)
 
 	# Add final face for inside bottom.
-	i = bottom_verts_inner.index * 4
+	i = bottom_verts_inner_center.index * 4
 	indices = indices + [i+1,i,i+3,i+2]
 
 	num = len(verts_list)
@@ -273,11 +277,11 @@ filename = "Cube.rib"
 # make RI calls after this function else we get a core dump
 ri.Begin("__render") #filename)
 ri.Integrator ('PxrPathTracer' ,'integrator')
-# ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "normals"}, {"normalCheck": 1})
+# ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "shaded"}, {"normalCheck": 1})
 ri.Option('searchpath', {'string texture':'./textures/:@'})
 ri.Hider('raytrace' ,{'int incremental' :[1]})
-ri.ShadingRate(1)
-ri.PixelVariance(0.01)
+ri.ShadingRate(10)
+ri.PixelVariance(0.1)
 # ArchiveRecord is used to add elements to the rib stream in this case comments
 # now we add the display element using the usual elements
 # FILENAME DISPLAY Type Output format
