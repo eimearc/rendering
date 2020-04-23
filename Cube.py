@@ -15,7 +15,6 @@ def Table():
 	]
 	ri.Patch("bilinear", {'P':verts})
 
-
 def CreateFaceLoop(startindex=0):
 	faces = [
 		0,4,5,1,
@@ -127,15 +126,15 @@ def Cylinder(radius=0.5, height=1.0):
 	top_verts_outer_top = Verts(x,y,z,8,0.1)
 
 	# 9
-	x=X_BASE * 0.9
+	x=X_BASE * 0.85
 	y=height
-	z=Z_BASE * 0.9
+	z=Z_BASE * 0.85
 	top_verts_inner = Verts(x,y,z,9,DEFAULT_SHARPNESS)
 
 	# 10
-	x=X_BASE*0.9
+	x=X_BASE*0.85
 	y=LIP_HEIGHT*2
-	z=Z_BASE*0.9
+	z=Z_BASE*0.85
 	bottom_verts_inner = Verts(x,y,z,10,3)
 	
 	verts_list = [
@@ -196,7 +195,7 @@ def MultipleCyliders():
   	# })
 
 	ri.TransformBegin()
-	ri.Translate(-6,1,0)
+	ri.Translate(-6,0,0)
 	Cylinder(height=height, radius=radius)
 	ri.TransformEnd()
 
