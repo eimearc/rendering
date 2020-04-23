@@ -70,84 +70,129 @@ def Cylinder(radius=0.5, height=1.0):
 	LIP_HEIGHT=height*0.08
 
 	DEFAULT_SHARPNESS=1.85
+	# DEFAULT_SHARPNESS=10
+
+	i = 0
 
 	# 0
-	x=X_BASE*0.7
-	y=LIP_HEIGHT*0.5
-	z=Z_BASE*0.7
-	bottom_verts_inner_top = Verts(x,y,z,0,DEFAULT_SHARPNESS)
+	x=X_BASE*0.5
+	y=LIP_HEIGHT*0.25
+	z=Z_BASE*0.5
+	bottom_verts_inner_top = Verts(x,y,z,i,0)
+	i += 1
 
 	# 1
-	x=X_BASE*0.8
+	x=X_BASE*0.7
 	y=0
-	z=Z_BASE*0.8
-	bottom_verts_inner_bottom = Verts(x,y,z,1,DEFAULT_SHARPNESS)
+	z=Z_BASE*0.7
+	bottom_verts_inner_bottom = Verts(x,y,z,i,DEFAULT_SHARPNESS)
+	i += 1
 
 	# 2
-	x=X_BASE*0.9
+	x=X_BASE*0.85
 	y=0
-	z=Z_BASE*0.9
-	bottom_verts_outer_bottom = Verts(x,y,z,2,DEFAULT_SHARPNESS)
+	z=Z_BASE*0.85
+	bottom_verts_outer_bottom = Verts(x,y,z,i,DEFAULT_SHARPNESS)
+	i += 1
+
+	x=X_BASE*0.89
+	y=LIP_HEIGHT*0.25
+	z=Z_BASE*0.89
+	bottom_verts_outer_middle_lower = Verts(x,y,z,i,0)
+	i += 1
 
 	# 3
 	x=X_BASE*0.95
 	y=LIP_HEIGHT*0.5
 	z=Z_BASE*0.95
-	bottom_verts_outer_middle = Verts(x,y,z,3,DEFAULT_SHARPNESS)
+	bottom_verts_outer_middle = Verts(x,y,z,i,DEFAULT_SHARPNESS)
+	i += 1
 
 	# 4
-	x=X_BASE
-	y=LIP_HEIGHT
-	z=Z_BASE
-	bottom_verts_outer_top = Verts(x,y,z,4,DEFAULT_SHARPNESS)
+	x=X_BASE*0.96
+	y=LIP_HEIGHT*0.75
+	z=Z_BASE*0.96
+	bottom_verts_outer_middle_upper = Verts(x,y,z,i,0)
+	i += 1
 
 	# 5
 	x=X_BASE
-	y=height*0.8
+	y=LIP_HEIGHT
 	z=Z_BASE
-	top_verts_outer_bottom = Verts(x,y,z,5,DEFAULT_SHARPNESS)
+	bottom_verts_outer_top = Verts(x,y,z,i,DEFAULT_SHARPNESS)
+	i += 1
+
+		# 5
+	x=X_BASE
+	y=LIP_HEIGHT*2
+	z=Z_BASE
+	bottom_verts_outer_top_above = Verts(x,y,z,i,DEFAULT_SHARPNESS)
+	i += 1
 
 	# 6
 	x=X_BASE
-	y=height*0.85
+	y=height*0.8
 	z=Z_BASE
-	top_verts_outer_middle_bottom = Verts(x,y,z,6,0.1)
+	top_verts_outer_bottom = Verts(x,y,z,i,DEFAULT_SHARPNESS)
+	i += 1
 
 	# 7
+	x=X_BASE
+	y=height*0.85
+	z=Z_BASE
+	top_verts_outer_middle_bottom = Verts(x,y,z,i,0.1)
+	i += 1
+
+	# 8
 	x=X_BASE*1.01
 	y=height*0.92
 	z=Z_BASE*1.01
-	top_verts_outer_middle_top = Verts(x,y,z,7,0.1)
+	top_verts_outer_middle_top = Verts(x,y,z,i,0.1)
+	i += 1
 
-	# 8
+	# 9
 	x=X_BASE
 	y=height
 	z=Z_BASE
-	top_verts_outer_top = Verts(x,y,z,8,0.1)
+	top_verts_outer_top = Verts(x,y,z,i,0.1)
+	i += 1
 
-	# 9
+	# 10
 	x=X_BASE * 0.85
 	y=height
 	z=Z_BASE * 0.85
-	top_verts_inner = Verts(x,y,z,9,DEFAULT_SHARPNESS)
+	top_verts_inner = Verts(x,y,z,i,DEFAULT_SHARPNESS)
+	i += 1
 
-	# 10
+	# 11
+	x=X_BASE * 0.85
+	y=(height-LIP_HEIGHT*2)/2.0
+	z=Z_BASE * 0.85
+	middle_verts_inner = Verts(x,y,z,i,DEFAULT_SHARPNESS)
+	i += 1
+
+	# 12
 	x=X_BASE*0.85
 	y=LIP_HEIGHT*2
 	z=Z_BASE*0.85
-	bottom_verts_inner = Verts(x,y,z,10,3)
+	bottom_verts_inner = Verts(x,y,z,i,3)
+	i += 1
 	
 	verts_list = [
 		bottom_verts_inner_top,
 		bottom_verts_inner_bottom,
 		bottom_verts_outer_bottom,
+		bottom_verts_outer_middle_lower,
 		bottom_verts_outer_middle,
+		bottom_verts_outer_middle_upper,
 		bottom_verts_outer_top,
+		bottom_verts_outer_top_above,
 		top_verts_outer_bottom,
 		top_verts_outer_middle_bottom,
 		top_verts_outer_middle_top,
 		top_verts_outer_top,
 		top_verts_inner,
+		middle_verts_inner,
 		bottom_verts_inner
 	]
 
@@ -193,7 +238,6 @@ def MultipleCyliders():
     #       'float specularRoughness' : [0.1], 
     #       'integer specularModelType' : [1] 
   	# })
-
 	ri.TransformBegin()
 	ri.Translate(-6,0,0)
 	Cylinder(height=height, radius=radius)
@@ -219,11 +263,12 @@ filename = "Cube.rib"
 # this is the begining of the rib archive generation we can only
 # make RI calls after this function else we get a core dump
 ri.Begin("__render") #filename)
-ri.Integrator ('PxrPathTracer' ,'integrator',{})
+ri.Integrator ('PxrPathTracer' ,'integrator')
+# ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "shaded"})
 ri.Option('searchpath', {'string texture':'./textures/:@'})
 ri.Hider('raytrace' ,{'int incremental' :[1]})
 ri.ShadingRate(10)
-ri.PixelVariance (0.1)
+ri.PixelVariance(0.1)
 # ArchiveRecord is used to add elements to the rib stream in this case comments
 # now we add the display element using the usual elements
 # FILENAME DISPLAY Type Output format
