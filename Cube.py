@@ -224,6 +224,7 @@ def MultipleCyliders():
 
 	ri.AttributeBegin()
 	ri.Attribute( 'identifier',{ 'name' :'cylinders'})
+	ri.Bxdf( 'PxrDisney','ceramic', { 'color baseColor' : [ 0.8, 0.8, 0.8] })
 	# ri.Bxdf('PxrSurface', 'plastic',{
     #       'color diffuseColor' : [1, 1, 1],
     #       'color clearcoatFaceColor' : [.5, .5, .5], 
