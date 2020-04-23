@@ -285,46 +285,80 @@ class HandleVerts():
 			"\n\tedge_loop: " + str(self.edge_loop) + \
 			"\n\tsharpness: " + str(self.sharpness)
 
+def HalfHandle(x,y,z,sharpness,sign=1,start_index=0,reverse=False):
+	X_BASE = x
+	Y_BASE = y
+	Z_BASE = z
+	SHARPNESS=sharpness
+
+	verts_list = []
+	i = start_index
+
+	x=-1
+	y=Y_BASE*0.75*sign
+	print(y)
+	z=Z_BASE
+	verts_list.append(HandleVerts(x,y,x-1,y,z,i,SHARPNESS))
+	i += 1
+
+	x=-1
+	y=Y_BASE*sign
+	z=Z_BASE
+	verts_list.append(HandleVerts(x,y,x-1,y+1*sign,z,i,SHARPNESS))
+	i += 1
+
+	x=0
+	y=Y_BASE*sign
+	z=Z_BASE
+	verts_list.append(HandleVerts(x,y,x,y+1*sign,z,i,SHARPNESS))
+	i += 1
+
+	x=1
+	y=Y_BASE*sign
+	z=Z_BASE
+	verts_list.append(HandleVerts(x,y,x+1,y+1*sign,z,i,SHARPNESS))
+	i += 1
+
+	x=1
+	y=Y_BASE*0.75*sign
+	z=Z_BASE
+	verts_list.append(HandleVerts(x,y,x+1,y,z,i,SHARPNESS))
+	i += 1
+
+	if reverse:
+		for i in range(len(verts_list)/2):
+			a = verts_list[i].verts
+			b = verts_list[len(verts_list)-i-1].verts
+			verts_list[len(verts_list)-i-1].verts = a
+			verts_list[i].verts = b
+
+	return verts_list
+
 def Handle(width=0.5, height=0.5):
 	X_BASE=1
 	Y_BASE=2
 	Z_BASE=0.5
-
-	THICKNESS=0.25
 	SHARPNESS=1
 
-	verts_list = []
-	i = 0
+	verts_list= []
+	verts_list = HalfHandle(X_BASE, Y_BASE, Z_BASE, SHARPNESS)
 
-	x=-1
-	y=Y_BASE*0.5
-	z=Z_BASE
-	verts_list.append(HandleVerts(x,y,x-0.1,y,z,i,SHARPNESS))
-	i += 1
+	i = len(verts_list)
+	# x=1
+	# y=Y_BASE*0.5
+	# z=Z_BASE
+	# verts_list.append(HandleVerts(x,y,x+1,y,z,i,SHARPNESS))
+	# i += 1
 
-	x=-1
-	y=Y_BASE
-	z=Z_BASE
-	verts_list.append(HandleVerts(x,y,x-0.1,y,z,i,SHARPNESS))
-	i += 1
+	other_verts = HalfHandle(X_BASE, Y_BASE, Z_BASE, SHARPNESS, sign=-1, start_index=i, reverse=True)
+	for v in other_verts:
+		verts_list.append(v)
 
-	x=0
-	y=Y_BASE
-	z=Z_BASE
-	verts_list.append(HandleVerts(x,y,x+0.1,y+0.1,z,i,SHARPNESS))
-	i += 1
-
-	x=1
-	y=Y_BASE
-	z=Z_BASE
-	verts_list.append(HandleVerts(x,y,x+1,y+1,z,i,SHARPNESS))
-	i += 1
-
-	x=1
-	y=Y_BASE*0.5
-	z=Z_BASE
-	verts_list.append(HandleVerts(x,y,x+1,y,z,i,SHARPNESS))
-	i += 1
+	# x=1
+	# y=Y_BASE*0.25
+	# z=Z_BASE
+	# verts_list.append(HandleVerts(x,y,x+1,y,z,i,SHARPNESS))
+	# i += 1
 
 	edgeloops  = [val for sublist in verts_list for val in sublist.edge_loop]
 	verts = [val for sublist in verts_list for val in sublist.verts]
@@ -345,9 +379,18 @@ def Handle(width=0.5, height=0.5):
 	floatargs = [v.sharpness for v in verts_list]
 	nfaces = len(indices)/4
 	nverts = [4]*nfaces
-
 	ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, edgeloops, floatargs, {ri.P: verts})
 
+def MultipleHandles():
+	ri.TransformBegin()
+	ri.Translate(-2,3,0)
+	Handle()
+	ri.TransformEnd()
+	ri.TransformBegin()
+	ri.Translate(2,2,0)
+	ri.Rotate(90,0,1,0)
+	Handle()
+	ri.TransformEnd()
 
 
 ri = prman.Ri() # create an instance of the RenderMan interface
@@ -357,8 +400,8 @@ filename = "Mug.rib"
 # this is the begining of the rib archive generation we can only
 # make RI calls after this function else we get a core dump
 ri.Begin("__render") #filename)
-ri.Integrator ('PxrPathTracer' ,'integrator')
-# ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "shaded"}, {"normalCheck": 1})
+# ri.Integrator ('PxrPathTracer' ,'integrator')
+ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "shaded"}, {"normalCheck": 1})
 ri.Option('searchpath', {'string texture':'./textures/:@'})
 ri.Hider('raytrace' ,{'int incremental' :[1]})
 ri.ShadingRate(10)
@@ -389,15 +432,11 @@ ri.Light( 'PxrDomeLight', 'domeLight', {
 ri.AttributeEnd()
 ri.TransformEnd()
 
-MultipleCyliders()
+# MultipleCyliders()
 Table()
+# MultipleHandles()
 ri.TransformBegin()
-ri.Translate(-2,0,0)
-Handle()
-ri.TransformEnd()
-ri.TransformBegin()
-ri.Translate(2,0,0)
-ri.Rotate(90,0,1,0)
+ri.Translate(0,3,0)
 Handle()
 ri.TransformEnd()
 
