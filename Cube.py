@@ -228,16 +228,24 @@ def MultipleCyliders():
 	# 	'color baseColor' : [ 0.8, 0.8, 0.8],
 	# 	'float specularRoughness': [0.01],
 	# })
-	ri.Bxdf('PxrSurface', 'greenglass',{ 
-		'color refractionColor' : [0,0.9,0],
-		'color diffuseColor' : [1, 1, 1],
-		'float diffuseGain' : 0,
-		'color specularEdgeColor' : [0.2, 1 ,0.2],
-		'float refractionGain' : [1.0],
-		'float reflectionGain' : [1.0],
-		'float glassRoughness' : [0.01],
-		'float glassIor' : [1.5],
-		'color extinction' : [0.0, 0.2 ,0.0],	
+	# ri.Bxdf('PxrSurface', 'greenglass',{ 
+	# 	'color refractionColor' : [0,0.9,0],
+	# 	'color diffuseColor' : [1, 1, 1],
+	# 	'float diffuseGain' : 0,
+	# 	'color specularEdgeColor' : [0.2, 1 ,0.2],
+	# 	'float refractionGain' : [1.0],
+	# 	'float reflectionGain' : [1.0],
+	# 	'float glassRoughness' : [0.01],
+	# 	'float glassIor' : [1.5],
+	# 	'color extinction' : [0.0, 0.2 ,0.0],	
+	# })
+	ri.Bxdf('PxrSurface', 'plastic',{
+			'color diffuseColor' : [.8, .8, .8],
+			'color specularEdgeColor' : [1, 1 , 1],
+			'color clearcoatFaceColor' : [.1, .1, .1], 
+			'color clearcoatEdgeColor' : [.1, .1, .1],
+			'float clearcoatRoughness' : 0.01,
+			'float clearcoatThickness' : 1,
 	})
 	ri.TransformBegin()
 	ri.Translate(-6,0,0)
@@ -268,14 +276,15 @@ ri.Integrator ('PxrPathTracer' ,'integrator')
 # ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "normals"}, {"normalCheck": 1})
 ri.Option('searchpath', {'string texture':'./textures/:@'})
 ri.Hider('raytrace' ,{'int incremental' :[1]})
-ri.ShadingRate(10)
-ri.PixelVariance(0.1)
+ri.ShadingRate(1)
+ri.PixelVariance(0.01)
 # ArchiveRecord is used to add elements to the rib stream in this case comments
 # now we add the display element using the usual elements
 # FILENAME DISPLAY Type Output format
 ri.Display("Cube.exr", "it", "rgba")
 # Specify PAL resolution 1:1 pixel Aspect ratio
 ri.Format(720,576,1)
+# ri.Format(1024, 720, 1)
 # now set the projection to perspective
 ri.Projection(ri.PERSPECTIVE,{ri.FOV:40}) 
 
