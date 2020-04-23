@@ -110,14 +110,14 @@ def Cylinder(radius=0.5, height=1.0):
 
 	# 6
 	x=X_BASE
-	y=height*0.9
+	y=height*0.85
 	z=Z_BASE
 	top_verts_outer_middle_bottom = Verts(x,y,z,6,0.1)
 
 	# 7
-	x=X_BASE*1.05
-	y=height*0.95
-	z=Z_BASE*1.05
+	x=X_BASE*1.01
+	y=height*0.92
+	z=Z_BASE*1.01
 	top_verts_outer_middle_top = Verts(x,y,z,7,0.1)
 
 	# 8
@@ -174,6 +174,44 @@ def Cylinder(radius=0.5, height=1.0):
 
 	ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, edgeloops, floatargs, {ri.P: verts})
 
+def MultipleCyliders():
+	height = 4.5
+	radius = 2
+
+	ri.AttributeBegin()
+	ri.Attribute( 'identifier',{ 'name' :'cylinders'})
+	# ri.Bxdf('PxrSurface', 'plastic',{
+    #       'color diffuseColor' : [1, 1, 1],
+    #       'color clearcoatFaceColor' : [.5, .5, .5], 
+    #       'color clearcoatEdgeColor' : [.25, .25, .25]
+	# })
+	# ri.Bxdf('PxrSurface', 'metal', {
+    #       'float diffuseGain' : [0],
+    #       'int specularFresnelMode' : [1],
+    #       'color specularEdgeColor' : [1 ,1 ,1],
+    #       'color specularIor' : [4.3696842, 2.916713, 1.654698],
+    #       'color specularExtinctionCoeff' : [5.20643, 4.2313662, 3.7549689],
+    #       'float specularRoughness' : [0.1], 
+    #       'integer specularModelType' : [1] 
+  	# })
+
+	ri.TransformBegin()
+	ri.Translate(-6,1,0)
+	Cylinder(height=height, radius=radius)
+	ri.TransformEnd()
+
+	ri.TransformBegin()
+	ri.Translate(0,radius,0)
+	ri.Rotate(-70,1,0,0)
+	Cylinder(height=height, radius=radius)
+	ri.TransformEnd()
+
+	ri.TransformBegin()
+	ri.Translate(6,radius,0)
+	ri.Rotate(90,1,0,0)
+	Cylinder(height=height, radius=radius)
+	ri.TransformEnd()
+	ri.AttributeEnd()
 
 ri = prman.Ri() # create an instance of the RenderMan interface
 ri.Option("rib", {"string asciistyle": "indented"})
@@ -182,6 +220,11 @@ filename = "Cube.rib"
 # this is the begining of the rib archive generation we can only
 # make RI calls after this function else we get a core dump
 ri.Begin("__render") #filename)
+ri.Integrator ('PxrPathTracer' ,'integrator',{})
+ri.Option('searchpath', {'string texture':'./textures/:@'})
+ri.Hider('raytrace' ,{'int incremental' :[1]})
+ri.ShadingRate(10)
+ri.PixelVariance (0.1)
 # ArchiveRecord is used to add elements to the rib stream in this case comments
 # now we add the display element using the usual elements
 # FILENAME DISPLAY Type Output format
@@ -194,30 +237,23 @@ ri.Projection(ri.PERSPECTIVE,{ri.FOV:40})
 # now we start our world
 ri.WorldBegin()
 
+# Camera transformation
 ri.Translate(0,-3,0)
 ri.Translate(0,0,20)
 ri.Rotate(-20,1,0,0)
 
-height = 4.5
-radius = 2
-
 ri.TransformBegin()
-ri.Translate(-6,1,0)
-Cylinder(height=height, radius=radius)
+ri.AttributeBegin()
+ri.Declare('domeLight' ,'string')
+ri.Rotate(-90,1,0,0)
+ri.Rotate(100,0,0,1)
+ri.Light( 'PxrDomeLight', 'domeLight', { 
+          'string lightColorMap'  : 'Luxo-Jr_4000x2000.tex'
+  })
+ri.AttributeEnd()
 ri.TransformEnd()
 
-ri.TransformBegin()
-ri.Translate(0,radius,0)
-ri.Rotate(-70,1,0,0)
-Cylinder(height=height, radius=radius)
-ri.TransformEnd()
-
-ri.TransformBegin()
-ri.Translate(6,radius,0)
-ri.Rotate(90,1,0,0)
-Cylinder(height=height, radius=radius)
-ri.TransformEnd()
-
+MultipleCyliders()
 Table()
 
 ri.WorldEnd()
