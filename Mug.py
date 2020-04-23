@@ -253,6 +253,103 @@ def MultipleCyliders():
 	ri.TransformEnd()
 	ri.AttributeEnd()
 
+class HandleVerts():
+	verts = []
+	indices = []
+	index = 0
+	edge_loop = []
+	sharpness = 0.0
+	thickness = 0.0
+
+	def __edge_loop__(self,x1,y1,x2,y2,z):
+		return [
+			x1, y1, -z,
+			x2, y2, -z,
+			x2, y2, z,
+			x1, y1, z
+		]
+
+	def __init__(self, x1, y1, x2, y2, z, index, sharpness):
+		self.index = index
+		self.verts = self.__edge_loop__(x1,y1,x2,y2,z)
+		self.index = index
+		self.indices = [(index*4 + i) for i in [0,1,2,3]]
+		self.edge_loop = [(index*4 + i) for i in [0,1,2,3,0]]
+		self.sharpness = sharpness
+
+	def __str__(self):
+		return str("Verts\n") + \
+			"\tverts: " + str(self.verts) + \
+			"\n\tindices: " + str(self.indices) + \
+			"\n\tindex: " + str(self.index) + \
+			"\n\tedge_loop: " + str(self.edge_loop) + \
+			"\n\tsharpness: " + str(self.sharpness)
+
+def Handle(width=0.5, height=0.5):
+	X_BASE=1
+	Y_BASE=2
+	Z_BASE=0.5
+
+	THICKNESS=0.25
+	SHARPNESS=1
+
+	verts_list = []
+	i = 0
+
+	x=-1
+	y=Y_BASE*0.5
+	z=Z_BASE
+	verts_list.append(HandleVerts(x,y,x-0.1,y,z,i,SHARPNESS))
+	i += 1
+
+	x=-1
+	y=Y_BASE
+	z=Z_BASE
+	verts_list.append(HandleVerts(x,y,x-0.1,y,z,i,SHARPNESS))
+	i += 1
+
+	x=0
+	y=Y_BASE
+	z=Z_BASE
+	verts_list.append(HandleVerts(x,y,x+0.1,y+0.1,z,i,SHARPNESS))
+	i += 1
+
+	x=1
+	y=Y_BASE
+	z=Z_BASE
+	verts_list.append(HandleVerts(x,y,x+1,y+1,z,i,SHARPNESS))
+	i += 1
+
+	x=1
+	y=Y_BASE*0.5
+	z=Z_BASE
+	verts_list.append(HandleVerts(x,y,x+1,y,z,i,SHARPNESS))
+	i += 1
+
+	edgeloops  = [val for sublist in verts_list for val in sublist.edge_loop]
+	verts = [val for sublist in verts_list for val in sublist.verts]
+
+	Z_BASE = width/2.0
+
+	indices = [
+		0,1,2,3
+	]
+	for i in range(len(verts_list)-1):
+		indices = indices + CreateFaceLoop(i)
+	# Add final face for inside bottom.
+	i = verts_list[len(verts_list)-1].index * 4
+	indices = indices + [i+1,i,i+3,i+2]
+	num = len(verts_list)
+	tags = [ri.CREASE]*num
+	nargs = [5,1]*num
+	floatargs = [v.sharpness for v in verts_list]
+	nfaces = len(indices)/4
+	nverts = [4]*nfaces
+
+	ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, edgeloops, floatargs, {ri.P: verts})
+
+
+
 ri = prman.Ri() # create an instance of the RenderMan interface
 ri.Option("rib", {"string asciistyle": "indented"})
 
@@ -294,6 +391,15 @@ ri.TransformEnd()
 
 MultipleCyliders()
 Table()
+ri.TransformBegin()
+ri.Translate(-2,0,0)
+Handle()
+ri.TransformEnd()
+ri.TransformBegin()
+ri.Translate(2,0,0)
+ri.Rotate(90,0,1,0)
+Handle()
+ri.TransformEnd()
 
 ri.WorldEnd()
 ri.End()
