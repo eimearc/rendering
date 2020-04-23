@@ -138,38 +138,41 @@ def Cylinder(radius=0.5, height=1.0):
 	INNER_XZ = X_BASE * (1-THICKNESS)
 	MIDDLE_XZ = X_BASE * (1-THICKNESS/2.0)
 
+	LIP_SHARPNESS=0.1
+	LIP_EXTRUDE_FRACTION=1.02
+
 	x=X_BASE
 	y=TOP_LIP_BOTTOM_Y
 	z=Z_BASE
-	verts_list.append(Verts(x,y,z,i,0.1))
+	verts_list.append(Verts(x,y,z,i,LIP_SHARPNESS))
 	i += 1
 
-	x=X_BASE*1.02
+	x=X_BASE*LIP_EXTRUDE_FRACTION
 	y=TOP_LIP_MIDDLE_Y
-	z=Z_BASE*1.02
-	verts_list.append(Verts(x,y,z,i,0.1))
+	z=Z_BASE*LIP_EXTRUDE_FRACTION
+	verts_list.append(Verts(x,y,z,i,LIP_SHARPNESS))
 	i += 1
 
 	x=MIDDLE_XZ
 	y=height
 	z=MIDDLE_XZ
-	verts_list.append(Verts(x,y,z,i,0.1))
+	verts_list.append(Verts(x,y,z,i,LIP_SHARPNESS))
 	i += 1
 
 	##################
 	# INSIDE THE MUG #
 	##################
 
-	x=INNER_XZ*0.98
+	x=INNER_XZ*(2-LIP_EXTRUDE_FRACTION)
 	y=TOP_LIP_MIDDLE_Y
-	z=INNER_XZ*0.98
-	verts_list.append(Verts(x,y,z,i,0.1))
+	z=INNER_XZ*(2-LIP_EXTRUDE_FRACTION)
+	verts_list.append(Verts(x,y,z,i,LIP_SHARPNESS))
 	i += 1
 
 	x=INNER_XZ
 	y=TOP_LIP_BOTTOM_Y
 	z=INNER_XZ
-	verts_list.append(Verts(x,y,z,i,0.1))
+	verts_list.append(Verts(x,y,z,i,LIP_SHARPNESS))
 	i += 1
 
 	x=INNER_XZ
@@ -224,21 +227,6 @@ def MultipleCyliders():
 
 	ri.AttributeBegin()
 	ri.Attribute( 'identifier',{ 'name' :'cylinders'})
-	# ri.Bxdf( 'PxrDisney','ceramic', {
-	# 	'color baseColor' : [ 0.8, 0.8, 0.8],
-	# 	'float specularRoughness': [0.01],
-	# })
-	# ri.Bxdf('PxrSurface', 'greenglass',{ 
-	# 	'color refractionColor' : [0,0.9,0],
-	# 	'color diffuseColor' : [1, 1, 1],
-	# 	'float diffuseGain' : 0,
-	# 	'color specularEdgeColor' : [0.2, 1 ,0.2],
-	# 	'float refractionGain' : [1.0],
-	# 	'float reflectionGain' : [1.0],
-	# 	'float glassRoughness' : [0.01],
-	# 	'float glassIor' : [1.5],
-	# 	'color extinction' : [0.0, 0.2 ,0.0],	
-	# })
 	ri.Bxdf('PxrSurface', 'plastic',{
 			'color diffuseColor' : [.8, .8, .8],
 			'color specularEdgeColor' : [1, 1 , 1],
@@ -268,27 +256,23 @@ def MultipleCyliders():
 ri = prman.Ri() # create an instance of the RenderMan interface
 ri.Option("rib", {"string asciistyle": "indented"})
 
-filename = "Cube.rib"
+filename = "Mug.rib"
 # this is the begining of the rib archive generation we can only
 # make RI calls after this function else we get a core dump
 ri.Begin("__render") #filename)
-# ri.Integrator ('PxrPathTracer' ,'integrator')
-ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "shaded"}, {"normalCheck": 1})
+ri.Integrator ('PxrPathTracer' ,'integrator')
+# ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "shaded"}, {"normalCheck": 1})
 ri.Option('searchpath', {'string texture':'./textures/:@'})
 ri.Hider('raytrace' ,{'int incremental' :[1]})
 ri.ShadingRate(10)
-ri.PixelVariance(0.5)
+ri.PixelVariance(0.1)
 # ArchiveRecord is used to add elements to the rib stream in this case comments
 # now we add the display element using the usual elements
 # FILENAME DISPLAY Type Output format
-ri.Display("Cube.exr", "it", "rgba")
+ri.Display("Mug.exr", "it", "rgba")
 # Specify PAL resolution 1:1 pixel Aspect ratio
-# ri.Format(720,576,1)
-ri.Format(1080, 720, 1)
-# now set the projection to perspective
+ri.Format(720,576,1)
 ri.Projection(ri.PERSPECTIVE,{ri.FOV:40}) 
-
-# now we start our world
 ri.WorldBegin()
 
 # Camera transformation
@@ -296,6 +280,7 @@ ri.Translate(0,-3,0)
 ri.Translate(0,0,20)
 ri.Rotate(-20,1,0,0)
 
+# Lighting
 ri.TransformBegin()
 ri.AttributeBegin()
 ri.Declare('domeLight' ,'string')
@@ -306,32 +291,6 @@ ri.Light( 'PxrDomeLight', 'domeLight', {
   })
 ri.AttributeEnd()
 ri.TransformEnd()
-
-# height = 4.5
-# radius = 2
-
-# ri.AttributeBegin()
-# ri.Attribute( 'identifier',{ 'name' :'cylinder'})
-# # ri.Bxdf( 'PxrDisney','ceramic', {
-# # 	'color baseColor' : [ 0.8, 0.8, 0.8],
-# # 	'float specularRoughness': [0.01],
-# # })
-# ri.Bxdf('PxrSurface', 'greenglass',{ 
-# 	'color refractionColor' : [0,0.9,0],
-# 	'color diffuseColor' : [1, 1, 1],
-# 	'float diffuseGain' : 0,
-# 	'color specularEdgeColor' : [0.2, 1 ,0.2],
-# 	'float refractionGain' : [1.0],
-# 	'float reflectionGain' : [1.0],
-# 	'float glassRoughness' : [0.01],
-# 	'float glassIor' : [1.5],
-# 	'color extinction' : [0.0, 0.2 ,0.0],	
-# })
-# ri.TransformBegin()
-# ri.Translate(0,0,0)
-# Cylinder(height=height, radius=radius)
-# ri.TransformEnd()
-# ri.AttributeEnd()
 
 MultipleCyliders()
 Table()
