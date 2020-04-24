@@ -338,16 +338,16 @@ def HalfHandle(x,y,z,sharpness,thickness,sign=1,start_index=0,reverse=False,heig
 	verts_list = []
 	i = start_index
 
-	x=X_BASE
+	x=X_BASE*0.5*-1
 	y=(Y_BASE+0.35*height)*sign
 	z=Z_BASE
 	verts_list.append(HandleVerts(x,y,x-THICKNESS,y,z,i,SHARPNESS))
 	i += 1
 
-	x=-1
+	x=X_BASE*0.5*-1
 	y=(Y_BASE+0.75*height)*sign
 	z=Z_BASE
-	verts_list.append(HandleVerts(x,y,x-THICKNESS,y+3*THICKNESS*sign,z,i,SHARPNESS))
+	verts_list.append(HandleVerts(x,y,x-THICKNESS,y+2.1*THICKNESS*sign,z,i,SHARPNESS))
 	i += 1
 
 	x=0
@@ -356,8 +356,8 @@ def HalfHandle(x,y,z,sharpness,thickness,sign=1,start_index=0,reverse=False,heig
 	verts_list.append(HandleVerts(x,y,x,y+THICKNESS*sign,z,i,SHARPNESS))
 	i += 1
 
-	x=1
-	y=(Y_BASE+0.85*height)*sign
+	x=X_BASE*0.7
+	y=(Y_BASE+0.7*height)*sign
 	z=Z_BASE
 	verts_list.append(HandleVerts(x,y,x+THICKNESS,y+THICKNESS*sign,z,i,SHARPNESS))
 	i += 1
@@ -371,18 +371,17 @@ def HalfHandle(x,y,z,sharpness,thickness,sign=1,start_index=0,reverse=False,heig
 
 	return verts_list
 
-def Handle(width=0.5, height=2, center_y=0.5):
-	X_BASE=-1
-	Y_BASE=center_y
+def Handle(width=1, height=2, center_y=0.5):
+	X_BASE=width
+	Y_BASE=height/2.0
 	Z_BASE=0.5
 	SHARPNESS=0.0
-	THICKNESS=0.3
+	THICKNESS=height/6.0
 
-	verts_list= []
 	verts_list = HalfHandle(X_BASE, Y_BASE, Z_BASE, SHARPNESS, thickness=THICKNESS, height=height)
 
 	i = len(verts_list)
-	x=X_BASE*(-1)+0.4
+	x=width*1.12
 	y=0
 	z=Z_BASE
 	verts_list.append(HandleVerts(x,y,x+THICKNESS,y,z,i,SHARPNESS))
@@ -392,7 +391,6 @@ def Handle(width=0.5, height=2, center_y=0.5):
 	for v in other_verts:
 		verts_list.append(v)
 
-	# edgeloops  = [val for sublist in verts_list for val in sublist.edge_loop]
 	verts = [val for sublist in verts_list for val in sublist.verts]
 
 	tmpedgeloops = []
@@ -427,7 +425,7 @@ def Handle(width=0.5, height=2, center_y=0.5):
 def MultipleHandles():
 	ri.TransformBegin()
 	ri.Translate(-2,3,0)
-	Handle()
+	Handle(height=2, width=1.5)
 	ri.TransformEnd()
 	ri.TransformBegin()
 	ri.Translate(2,2,0)
