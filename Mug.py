@@ -220,7 +220,7 @@ def Cylinder(radius=0.5, height=1.0):
 	# Add final face for inside bottom.
 	i = verts_list[len(verts_list)-1].index * NUM_CYLINDER_VERTS
 	print("last index:" + str(i))
-	indices += [i+1,i,i+3,i+2,i+5,i+4]
+	indices += [i+1,i,i+5,i+4,i+3,i+2]
 	nverts += [6]
 
 	num = len(verts_list)
@@ -457,8 +457,8 @@ filename = "Mug.rib"
 # this is the begining of the rib archive generation we can only
 # make RI calls after this function else we get a core dump
 ri.Begin("__render") #filename)
-# ri.Integrator ('PxrPathTracer' ,'integrator')
-ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "shaded"}, {"normalCheck": 1})
+ri.Integrator ('PxrPathTracer' ,'integrator')
+# ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "shaded"}, {"normalCheck": 1})
 
 ri.Option('searchpath', {'string texture':'./textures/:@'})
 ri.Hider('raytrace' ,{'int incremental' :[1]})
