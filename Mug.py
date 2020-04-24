@@ -310,17 +310,17 @@ class HandleVerts():
 	sharpness = 0.0
 	thickness = 0.0
 
-	def __edge_loop__(self,x1,y1,x2,y2,z):
+	def __edge_loop__(self,x1,y1,x2,y2,z1,z2):
 		return [
-			x1, y1, z,
-			x2, y2, z,
-			x2, y2, -z,
-			x1, y1, -z
+			x1, y1, z1,
+			x2, y2, z1,
+			x2, y2, z2,
+			x1, y1, z2
 		]
 
-	def __init__(self, x1, y1, x2, y2, z, index, sharpness):
+	def __init__(self, x1, y1, x2, y2, z1, z2, index, sharpness):
 		self.index = index
-		self.verts = self.__edge_loop__(x1,y1,x2,y2,z)
+		self.verts = self.__edge_loop__(x1,y1,x2,y2,z1,z2)
 		self.index = index
 		self.indices = [(index*4 + i) for i in [0,1,2,3]]
 		self.edge_loop = [(index*4 + i) for i in [0,1,2,3,0]]
@@ -368,25 +368,25 @@ def HalfHandle(x,y,z,sharpness,thickness,sign=1,start_index=0,reverse=False,heig
 	x=X_BASE*0.5*-1
 	y=(Y_BASE*0.8)*sign
 	z=Z_BASE
-	verts_list.append(HandleVerts(x,y,x-THICKNESS,y,z,i,SHARPNESS))
+	verts_list.append(HandleVerts(x,y,x-THICKNESS,y,z,-z,i,SHARPNESS))
 	i += 1
 
 	x=X_BASE*0.5*-1
 	y=(Y_BASE+0.5*height)*sign
 	z=Z_BASE
-	verts_list.append(HandleVerts(x,y,x-2.5*THICKNESS,y+2*THICKNESS*sign,z,i,SHARPNESS))
+	verts_list.append(HandleVerts(x,y,x-2.5*THICKNESS,y+2*THICKNESS*sign,z,-z,i,SHARPNESS))
 	i += 1
 
 	x=0
 	y=(Y_BASE+height)*sign
 	z=Z_BASE
-	verts_list.append(HandleVerts(x,y,x,y+THICKNESS*sign,z,i,SHARPNESS))
+	verts_list.append(HandleVerts(x,y,x,y+THICKNESS*sign,z,-z,i,SHARPNESS))
 	i += 1
 
 	x=X_BASE*0.7
 	y=(Y_BASE+0.7*height)*sign
 	z=Z_BASE
-	verts_list.append(HandleVerts(x,y,x+THICKNESS,y+THICKNESS*sign,z,i,SHARPNESS))
+	verts_list.append(HandleVerts(x,y,x+THICKNESS,y+THICKNESS*sign,z,-z,i,SHARPNESS))
 	i += 1
 
 	if reverse:
@@ -411,7 +411,7 @@ def Handle(width=1, height=2, center_y=0.5):
 	x=width*1.12
 	y=0
 	z=Z_BASE
-	verts_list.append(HandleVerts(x,y,x+THICKNESS,y,z,i,SHARPNESS))
+	verts_list.append(HandleVerts(x,y,x+THICKNESS,y,z,-z,i,SHARPNESS))
 	i += 1
 
 	other_verts = HalfHandle(X_BASE, Y_BASE, Z_BASE, SHARPNESS, thickness=THICKNESS, sign=-1, start_index=i, reverse=True, height=height)
