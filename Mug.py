@@ -219,10 +219,7 @@ def Cylinder(radius=0.5, height=1.0):
 	nfaces = len(indices)/4
 	nverts = [4]*nfaces
 
-	component = Component(nverts, indices, tags, nargs, edgeloops, floatargs, verts)
-	return component
-
-	# ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, edgeloops, floatargs, {ri.P: verts})
+	return Component(nverts, indices, tags, nargs, edgeloops, floatargs, verts)
 
 class Component():
 	nverts = []
@@ -241,31 +238,20 @@ class Component():
 		self.intargs = intargs
 		self.floatargs = floatargs
 		self.verts = verts
-		print(len(self.verts))
-		print(len(self.nverts))
-		print(len(self.indices))
 
 	def draw(self):
 		ri.SubdivisionMesh("catmull-clark",
 			self.nverts, self.indices, self.tags, self.nargs, self.intargs, self.floatargs, {ri.P: self.verts})
 
 	def add(self, other):
-		self.nverts = self.nverts + other.nverts
+		self.nverts += other.nverts
 		start_index = len(self.verts)/3
-		tmpindices = [i+start_index for i in other.indices]
-		self.indices = self.indices + tmpindices
-		print("Start index:" + str(start_index))
-		print(self.indices)
-		self.tags = self.tags + other.tags
-		self.nargs = self.nargs + other.nargs
-		tmpintargs = [i+start_index for i in other.intargs]
-		self.intargs = self.intargs + tmpintargs
-		self.floatargs = self.floatargs + other.floatargs
-		self.verts = self.verts + other.verts
-		print(len(self.verts))
-		print(len(self.nverts))
-		print(len(self.indices))
-		# print(len(self.))
+		self.indices += [i+start_index for i in other.indices]
+		self.tags += other.tags
+		self.nargs += other.nargs
+		self.intargs += [i+start_index for i in other.intargs]
+		self.floatargs += other.floatargs
+		self.verts += other.verts
 
 
 def MultipleCyliders():
@@ -284,19 +270,22 @@ def MultipleCyliders():
 	})
 	ri.TransformBegin()
 	ri.Translate(-6,0,0)
-	Cylinder(height=height, radius=radius)
+	cylinder = Cylinder(height=height, radius=radius)
+	cylinder.draw()
 	ri.TransformEnd()
 
 	ri.TransformBegin()
 	ri.Translate(0,radius,0)
 	ri.Rotate(-70,1,0,0)
-	Cylinder(height=height, radius=radius)
+	cylinder = Cylinder(height=height, radius=radius)
+	cylinder.draw()
 	ri.TransformEnd()
 
 	ri.TransformBegin()
 	ri.Translate(6,radius,0)
 	ri.Rotate(90,1,0,0)
-	Cylinder(height=height, radius=radius)
+	cylinder = Cylinder(height=height, radius=radius)
+	cylinder.draw()
 	ri.TransformEnd()
 	ri.AttributeEnd()
 
@@ -344,12 +333,12 @@ def HalfHandle(x,y,z,sharpness,sign=1,start_index=0,reverse=False):
 	Y_BASE = y
 	Z_BASE = z
 	SHARPNESS=sharpness
-	THICKNESS=0.4
+	THICKNESS=0.2*y
 
 	verts_list = []
 	i = start_index
 
-	x=-1
+	x=X_BASE
 	y=Y_BASE*0.75*sign
 	z=Z_BASE
 	verts_list.append(HandleVerts(x,y,x-THICKNESS,y,z,i,SHARPNESS))
@@ -383,7 +372,7 @@ def HalfHandle(x,y,z,sharpness,sign=1,start_index=0,reverse=False):
 	return verts_list
 
 def Handle(width=0.5, height=0.5):
-	X_BASE=1
+	X_BASE=-1
 	Y_BASE=2
 	Z_BASE=0.5
 	SHARPNESS=0.0
@@ -393,7 +382,7 @@ def Handle(width=0.5, height=0.5):
 	verts_list = HalfHandle(X_BASE, Y_BASE, Z_BASE, SHARPNESS)
 
 	i = len(verts_list)
-	x=X_BASE+0.15
+	x=X_BASE*(-1)+0.15
 	y=0
 	z=Z_BASE
 	verts_list.append(HandleVerts(x,y,x+THICKNESS,y,z,i,SHARPNESS))
@@ -417,8 +406,6 @@ def Handle(width=0.5, height=0.5):
 		tmpedgeloops = tmpedgeloops + edgeloop
 		tmpnargs = tmpnargs + [len(edgeloop),1]
 		tmpfloatargs.append(SHARPNESS) # Sharpness
-
-	
 
 	Z_BASE = width/2.0
 
@@ -489,15 +476,15 @@ ri.Light( 'PxrDomeLight', 'domeLight', {
 ri.AttributeEnd()
 ri.TransformEnd()
 
-# MultipleCyliders()
-# Table()
+MultipleCyliders()
+Table()
 MultipleHandles()
 # ri.TransformBegin()
 # ri.Translate(0,3,0)
 # Handle()
 # ri.TransformEnd()
 
-Mug()
+# Mug()
 
 ri.WorldEnd()
 ri.End()
