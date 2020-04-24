@@ -66,7 +66,7 @@ class Verts():
 			"\n\tedge_loop: " + str(self.edge_loop) + \
 			"\n\tsharpness: " + str(self.sharpness)
 		
-def Cylinder(radius=0.5, height=1.0):
+def Cylinder(radius=2, height=4.5):
 	X_BASE=math.sqrt((radius*radius)/1.5)
 	Z_BASE=X_BASE
 	LIP_HEIGHT=height*0.08
@@ -334,13 +334,13 @@ class HandleVerts():
 			"\n\tedge_loop: " + str(self.edge_loop) + \
 			"\n\tsharpness: " + str(self.sharpness)
 
-def Mug(width=0.5, height=0.5):
+def Mug(height=4.5, radius=2):
 	ri = prman.Ri()
-	cylinder = Cylinder(height=4.5,radius=2)
+	cylinder = Cylinder()
 	cylinder.draw()
 	ri.TransformBegin()
 	ri.Translate(2.1,2.4,0)
-	handle = Handle(height=1)
+	handle = Handle(height=height/4.5)
 	handle.draw()
 	ri.TransformEnd()
 
@@ -451,6 +451,25 @@ def MultipleHandles():
 	Handle()
 	ri.TransformEnd()
 
+def MultipleMugs():
+	ri.TransformBegin()
+	ri.Translate(-1,0,0)
+	Mug()
+	ri.TransformEnd()
+
+	ri.TransformBegin()
+	ri.Translate(4,0,-2)
+	ri.Rotate(57,0,1,0)
+	Mug()
+	ri.TransformEnd()
+
+	ri.TransformBegin()
+	ri.Translate(-6,1.5,-2)
+	ri.Rotate(-120,0,1,0)
+	ri.Rotate(-110,1,0,0)
+	ri.Rotate(90,0,0,1)
+	Mug()
+	ri.TransformEnd()
 
 ri = prman.Ri() # create an instance of the RenderMan interface
 ri.Option("rib", {"string asciistyle": "indented"})
@@ -493,16 +512,7 @@ ri.AttributeEnd()
 ri.TransformEnd()
 
 Table()
-
-ri.TransformBegin()
-ri.Translate(-3,0,0)
-Mug()
-ri.TransformEnd()
-
-ri.TransformBegin()
-ri.Translate(3,0,0)
-Mug()
-ri.TransformEnd()
+MultipleMugs()
 
 ri.WorldEnd()
 ri.End()
