@@ -2,6 +2,8 @@
 import prman
 import math
 
+NUM_CYLINDER_VERTS=6
+
 def Table():
 	ri = prman.Ri()
 	x = 10
@@ -17,22 +19,26 @@ def Table():
 
 def CreateFaceLoop(startindex=0):
 	faces = [
-		0,4,5,1,
-		1,5,6,2,
-		2,6,7,3,
-		3,7,4,0
+		0,6,7,1,
+		1,7,8,2,
+		2,8,9,3,
+		3,9,10,4,
+		4,10,11,5,
+		5,11,6,0
 	]
-	faces = [i+(startindex*4) for i in faces]
+	faces = [i+(startindex*NUM_CYLINDER_VERTS) for i in faces]
 	return faces
 
 def CreateEdgeLoop(startindex=0):
-	edges = [0,1,2,3,0]
-	edges = [i+(startindex*4) for i in edges]
+	edges = [0,1,2,3,4,5,0]
+	edges = [i+(startindex*NUM_CYLINDER_VERTS) for i in edges]
 	return edges
 
-def Square(x,y,z):
+def Square(x,y,z,angle):
 	return [
 		-x, y, -z,
+		-x/2.0, y, -z, # New
+		x/2.0, y, -z, # New
 		x, y, -z,
 		x, y, z,
 		-x, y, z
@@ -49,10 +55,10 @@ class Verts():
 	def __init__(self, x, y, z, index, sharpness):
 		self.index = index
 		self.y = y
-		self.verts = Square(x,y,z)
+		self.verts = Square(x,y,z,10)
 		self.index = index
-		self.indices = [(index*4 + i) for i in [0,1,2,3]]
-		self.edge_loop = [(index*4 + i) for i in [0,1,2,3,0]]
+		self.indices = [(index*NUM_CYLINDER_VERTS + i) for i in [0,1,2,3,4,5]]
+		self.edge_loop = [(index*NUM_CYLINDER_VERTS + i) for i in [0,1,2,3,4,5,0]]
 		self.sharpness = sharpness
 
 	def __str__(self):
@@ -202,22 +208,36 @@ def Cylinder(radius=0.5, height=1.0):
 	edgeloops  = [val for sublist in verts_list for val in sublist.edge_loop]
 	verts = [val for sublist in verts_list for val in sublist.verts]
 
-	indices = [
-		0,1,2,3
-	]
+	# indices = [
+	# 	0,1,2,3
+	# ]
+	indices = []
+	nfaces = 0
 	for i in range(len(verts_list)-1):
+		print("Creating faceloop for " + str(i))
 		indices = indices + CreateFaceLoop(i)
+		nfaces += 6
 
 	# Add final face for inside bottom.
-	i = verts_list[len(verts_list)-1].index * 4
-	indices = indices + [i+1,i,i+3,i+2]
+	i = verts_list[len(verts_list)-1].index * NUM_CYLINDER_VERTS
+	print("last index:" + str(i))
+	# indices = indices + [i+1,i,i+3,i+2]
 
 	num = len(verts_list)
 	tags = [ri.CREASE]*num
-	nargs = [5,1]*num
+	nargs = [NUM_CYLINDER_VERTS+1,1]*num
 	floatargs = [v.sharpness for v in verts_list]
-	nfaces = len(indices)/4
+	# nfaces = len(indices)/(NUM_CYLINDER_VERTS)
 	nverts = [4]*nfaces
+
+	print("")
+	print("indices:" + str(len(indices)/(4)) + " --> " + str(len(indices)))
+	print("nargs: " + str(len(nargs)))
+	print("edgeloops: " + str(len(edgeloops)))
+	print("floatargs: " + str(len(floatargs)))
+	print("nfaces:" + str(nfaces))
+	print("number of verts:" + str(len(verts)/3.0) + " --> " + str(len(verts)))
+	print("nverts: " + str(len(nverts)))
 
 	return Component(nverts, indices, tags, nargs, edgeloops, floatargs, verts)
 
@@ -252,7 +272,6 @@ class Component():
 		self.intargs += [i+start_index for i in other.intargs]
 		self.floatargs += other.floatargs
 		self.verts += other.verts
-
 
 def MultipleCyliders():
 	height = 4.5
@@ -326,7 +345,6 @@ def Mug(width=0.5, height=0.5):
 	cylinder.draw()
 	cylinder.add(Cylinder(height=2,radius=10))
 	cylinder.draw()
-
 
 def HalfHandle(x,y,z,sharpness,thickness,sign=1,start_index=0,reverse=False,height=2):
 	X_BASE = x
@@ -474,9 +492,9 @@ ri.Light( 'PxrDomeLight', 'domeLight', {
 ri.AttributeEnd()
 ri.TransformEnd()
 
-# MultipleCyliders()
-# Table()
-MultipleHandles()
+MultipleCyliders()
+Table()
+# MultipleHandles()
 # ri.TransformBegin()
 # ri.Translate(0,3,0)
 # Handle()
