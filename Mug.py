@@ -225,7 +225,7 @@ def Cylinder(radius=0.5, height=1.0):
 	# ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, edgeloops, floatargs, {ri.P: verts})
 
 class Component():
-	nverts = 0
+	nverts = []
 	indices = []
 	tags = []
 	nargs = []
@@ -241,10 +241,31 @@ class Component():
 		self.intargs = intargs
 		self.floatargs = floatargs
 		self.verts = verts
+		print(len(self.verts))
+		print(len(self.nverts))
+		print(len(self.indices))
 
 	def draw(self):
 		ri.SubdivisionMesh("catmull-clark",
 			self.nverts, self.indices, self.tags, self.nargs, self.intargs, self.floatargs, {ri.P: self.verts})
+
+	def add(self, other):
+		self.nverts = self.nverts + other.nverts
+		start_index = len(self.verts)/3
+		tmpindices = [i+start_index for i in other.indices]
+		self.indices = self.indices + tmpindices
+		print("Start index:" + str(start_index))
+		print(self.indices)
+		self.tags = self.tags + other.tags
+		self.nargs = self.nargs + other.nargs
+		tmpintargs = [i+start_index for i in other.intargs]
+		self.intargs = self.intargs + tmpintargs
+		self.floatargs = self.floatargs + other.floatargs
+		self.verts = self.verts + other.verts
+		print(len(self.verts))
+		print(len(self.nverts))
+		print(len(self.indices))
+		# print(len(self.))
 
 
 def MultipleCyliders():
@@ -313,6 +334,8 @@ class HandleVerts():
 
 def Mug(width=0.5, height=0.5):
 	cylinder = Cylinder(height=4.5,radius=2)
+	cylinder.draw()
+	cylinder.add(Cylinder(height=2,radius=10))
 	cylinder.draw()
 
 
