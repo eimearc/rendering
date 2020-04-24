@@ -219,7 +219,33 @@ def Cylinder(radius=0.5, height=1.0):
 	nfaces = len(indices)/4
 	nverts = [4]*nfaces
 
-	ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, edgeloops, floatargs, {ri.P: verts})
+	component = Component(nverts, indices, tags, nargs, edgeloops, floatargs, verts)
+	return component
+
+	# ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, edgeloops, floatargs, {ri.P: verts})
+
+class Component():
+	nverts = 0
+	indices = []
+	tags = []
+	nargs = []
+	intargs = []
+	floatargs = []
+	verts = []
+
+	def __init__(self, nverts, indices, tags, nargs, intargs, floatargs, verts):
+		self.nverts = nverts
+		self.indices = indices
+		self.tags = tags
+		self.nargs = nargs
+		self.intargs = intargs
+		self.floatargs = floatargs
+		self.verts = verts
+
+	def draw(self):
+		ri.SubdivisionMesh("catmull-clark",
+			self.nverts, self.indices, self.tags, self.nargs, self.intargs, self.floatargs, {ri.P: self.verts})
+
 
 def MultipleCyliders():
 	height = 4.5
@@ -284,6 +310,11 @@ class HandleVerts():
 			"\n\tindex: " + str(self.index) + \
 			"\n\tedge_loop: " + str(self.edge_loop) + \
 			"\n\tsharpness: " + str(self.sharpness)
+
+def Mug(width=0.5, height=0.5):
+	cylinder = Cylinder(height=4.5,radius=2)
+	cylinder.draw()
+
 
 def HalfHandle(x,y,z,sharpness,sign=1,start_index=0,reverse=False):
 	X_BASE = x
@@ -442,6 +473,8 @@ MultipleHandles()
 # ri.Translate(0,3,0)
 # Handle()
 # ri.TransformEnd()
+
+Mug()
 
 ri.WorldEnd()
 ri.End()
