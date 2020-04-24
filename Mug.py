@@ -2,7 +2,7 @@
 import prman
 import math
 
-NUM_CYLINDER_VERTS=6
+NUM_CYLINDER_VERTS=4
 
 def Table():
 	ri = prman.Ri()
@@ -19,26 +19,22 @@ def Table():
 
 def CreateFaceLoop(startindex=0):
 	faces = [
-		0,6,7,1,
-		1,7,8,2,
-		2,8,9,3,
-		3,9,10,4,
-		4,10,11,5,
-		5,11,6,0
+		0,4,5,1,
+		1,5,6,2,
+		2,6,7,3,
+		3,7,4,0
 	]
 	faces = [i+(startindex*NUM_CYLINDER_VERTS) for i in faces]
 	return faces
 
 def CreateEdgeLoop(startindex=0):
-	edges = [0,1,2,3,4,5,0]
+	edges = [0,1,2,3,0]
 	edges = [i+(startindex*NUM_CYLINDER_VERTS) for i in edges]
 	return edges
 
 def Square(x,y,z,angle):
 	return [
 		-x, y, -z,
-		-x/2.0, y, -z, # New
-		x/2.0, y, -z, # New
 		x, y, -z,
 		x, y, z,
 		-x, y, z
@@ -57,8 +53,8 @@ class Verts():
 		self.y = y
 		self.verts = Square(x,y,z,10)
 		self.index = index
-		self.indices = [(index*NUM_CYLINDER_VERTS + i) for i in [0,1,2,3,4,5]]
-		self.edge_loop = [(index*NUM_CYLINDER_VERTS + i) for i in [0,1,2,3,4,5,0]]
+		self.indices = [(index*NUM_CYLINDER_VERTS + i) for i in range(NUM_CYLINDER_VERTS)]
+		self.edge_loop = [(index*NUM_CYLINDER_VERTS + i) for i in (range(NUM_CYLINDER_VERTS)+[0])]
 		self.sharpness = sharpness
 
 	def __str__(self):
@@ -209,19 +205,19 @@ def Cylinder(radius=0.5, height=1.0):
 	verts = [val for sublist in verts_list for val in sublist.verts]
 
 	indices = [
-		0,1,2,3,4,5
+		0,1,2,3
 	]
-	nverts = [6]
+	nverts = [4]
 	for i in range(len(verts_list)-1):
 		print("Creating faceloop for " + str(i))
 		indices = indices + CreateFaceLoop(i)
-		nverts += [4]*6
+		nverts += [4]*4
 
 	# Add final face for inside bottom.
 	i = verts_list[len(verts_list)-1].index * NUM_CYLINDER_VERTS
 	print("last index:" + str(i))
-	indices += [i+1,i,i+5,i+4,i+3,i+2]
-	nverts += [6]
+	indices += [i+1,i,i+3,i+2]
+	nverts += [4]
 
 	num = len(verts_list)
 	tags = [ri.CREASE]*num
