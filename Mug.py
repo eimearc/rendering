@@ -335,10 +335,14 @@ class HandleVerts():
 			"\n\tsharpness: " + str(self.sharpness)
 
 def Mug(width=0.5, height=0.5):
+	ri = prman.Ri()
 	cylinder = Cylinder(height=4.5,radius=2)
 	cylinder.draw()
-	cylinder.add(Cylinder(height=2,radius=10))
-	cylinder.draw()
+	ri.TransformBegin()
+	ri.Translate(2.1,2.4,0)
+	handle = Handle(height=1)
+	handle.draw()
+	ri.TransformEnd()
 
 def HalfHandle(x,y,z,sharpness,thickness,sign=1,start_index=0,reverse=False,height=2):
 	X_BASE = x
@@ -434,6 +438,8 @@ def Handle(width=1, height=2, center_y=0.5):
 	nverts = [4]*nfaces
 	ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, tmpedgeloops, floatargs, {ri.P: verts})
 
+	return Component(nverts, indices, tags, nargs, tmpedgeloops, floatargs, verts)
+
 def MultipleHandles():
 	ri.TransformBegin()
 	ri.Translate(-2,3,0)
@@ -453,8 +459,8 @@ filename = "Mug.rib"
 # this is the begining of the rib archive generation we can only
 # make RI calls after this function else we get a core dump
 ri.Begin("__render") #filename)
-ri.Integrator ('PxrPathTracer' ,'integrator')
-# ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "shaded"}, {"normalCheck": 1})
+# ri.Integrator ('PxrPathTracer' ,'integrator')
+ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "shaded"}, {"normalCheck": 1})
 
 ri.Option('searchpath', {'string texture':'./textures/:@'})
 ri.Hider('raytrace' ,{'int incremental' :[1]})
@@ -486,15 +492,17 @@ ri.Light( 'PxrDomeLight', 'domeLight', {
 ri.AttributeEnd()
 ri.TransformEnd()
 
-MultipleCyliders()
 Table()
-# MultipleHandles()
-# ri.TransformBegin()
-# ri.Translate(0,3,0)
-# Handle()
-# ri.TransformEnd()
 
-# Mug()
+ri.TransformBegin()
+ri.Translate(-3,0,0)
+Mug()
+ri.TransformEnd()
+
+ri.TransformBegin()
+ri.Translate(3,0,0)
+Mug()
+ri.TransformEnd()
 
 ri.WorldEnd()
 ri.End()
