@@ -366,15 +366,15 @@ def HalfHandle(x,y,z,sharpness,thickness,sign=1,start_index=0,reverse=False,heig
 	i = start_index
 
 	x=X_BASE*0.5*-1
-	y=(Y_BASE+0.35*height)*sign
+	y=(Y_BASE*0.8)*sign
 	z=Z_BASE
 	verts_list.append(HandleVerts(x,y,x-THICKNESS,y,z,i,SHARPNESS))
 	i += 1
 
 	x=X_BASE*0.5*-1
-	y=(Y_BASE+0.75*height)*sign
+	y=(Y_BASE+0.5*height)*sign
 	z=Z_BASE
-	verts_list.append(HandleVerts(x,y,x-THICKNESS,y+2.1*THICKNESS*sign,z,i,SHARPNESS))
+	verts_list.append(HandleVerts(x,y,x-2.5*THICKNESS,y+2*THICKNESS*sign,z,i,SHARPNESS))
 	i += 1
 
 	x=0
@@ -403,7 +403,7 @@ def Handle(width=1, height=2, center_y=0.5):
 	Y_BASE=height/2.0
 	Z_BASE=0.5
 	SHARPNESS=0.0
-	THICKNESS=height/6.0
+	THICKNESS=height/5.0
 
 	verts_list = HalfHandle(X_BASE, Y_BASE, Z_BASE, SHARPNESS, thickness=THICKNESS, height=height)
 
@@ -489,8 +489,8 @@ filename = "Mug.rib"
 # this is the begining of the rib archive generation we can only
 # make RI calls after this function else we get a core dump
 ri.Begin("__render") #filename)
-ri.Integrator ('PxrPathTracer' ,'integrator')
-# ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "normals"}, {"normalCheck": 0})
+# ri.Integrator ('PxrPathTracer' ,'integrator')
+ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "shaded"}, {"normalCheck": 0})
 
 ri.Option('searchpath', {'string texture':'./textures/:@'})
 ri.Hider('raytrace' ,{'int incremental' :[1]})
