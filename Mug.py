@@ -328,36 +328,36 @@ def Mug(width=0.5, height=0.5):
 	cylinder.draw()
 
 
-def HalfHandle(x,y,z,sharpness,sign=1,start_index=0,reverse=False):
+def HalfHandle(x,y,z,sharpness,thickness,sign=1,start_index=0,reverse=False,height=2):
 	X_BASE = x
 	Y_BASE = y
 	Z_BASE = z
 	SHARPNESS=sharpness
-	THICKNESS=0.2*y
+	THICKNESS=thickness
 
 	verts_list = []
 	i = start_index
 
 	x=X_BASE
-	y=Y_BASE*0.75*sign
+	y=(Y_BASE+0.35*height)*sign
 	z=Z_BASE
 	verts_list.append(HandleVerts(x,y,x-THICKNESS,y,z,i,SHARPNESS))
 	i += 1
 
 	x=-1
-	y=Y_BASE*sign
+	y=(Y_BASE+0.75*height)*sign
 	z=Z_BASE
 	verts_list.append(HandleVerts(x,y,x-THICKNESS,y+3*THICKNESS*sign,z,i,SHARPNESS))
 	i += 1
 
 	x=0
-	y=(Y_BASE+1)*sign
+	y=(Y_BASE+height)*sign
 	z=Z_BASE
 	verts_list.append(HandleVerts(x,y,x,y+THICKNESS*sign,z,i,SHARPNESS))
 	i += 1
 
 	x=1
-	y=Y_BASE*0.85*sign
+	y=(Y_BASE+0.85*height)*sign
 	z=Z_BASE
 	verts_list.append(HandleVerts(x,y,x+THICKNESS,y+THICKNESS*sign,z,i,SHARPNESS))
 	i += 1
@@ -371,24 +371,24 @@ def HalfHandle(x,y,z,sharpness,sign=1,start_index=0,reverse=False):
 
 	return verts_list
 
-def Handle(width=0.5, height=0.5):
+def Handle(width=0.5, height=0.5, center_y=0.5):
 	X_BASE=-1
-	Y_BASE=2
+	Y_BASE=center_y
 	Z_BASE=0.5
 	SHARPNESS=0.0
-	THICKNESS=0.4
+	THICKNESS=0.3
 
 	verts_list= []
-	verts_list = HalfHandle(X_BASE, Y_BASE, Z_BASE, SHARPNESS)
+	verts_list = HalfHandle(X_BASE, Y_BASE, Z_BASE, SHARPNESS, thickness=THICKNESS)
 
 	i = len(verts_list)
-	x=X_BASE*(-1)+0.15
+	x=X_BASE*(-1)+0.4
 	y=0
 	z=Z_BASE
 	verts_list.append(HandleVerts(x,y,x+THICKNESS,y,z,i,SHARPNESS))
 	i += 1
 
-	other_verts = HalfHandle(X_BASE, Y_BASE, Z_BASE, SHARPNESS, sign=-1, start_index=i, reverse=True)
+	other_verts = HalfHandle(X_BASE, Y_BASE, Z_BASE, SHARPNESS, thickness=THICKNESS, sign=-1, start_index=i, reverse=True)
 	for v in other_verts:
 		verts_list.append(v)
 
@@ -476,8 +476,8 @@ ri.Light( 'PxrDomeLight', 'domeLight', {
 ri.AttributeEnd()
 ri.TransformEnd()
 
-MultipleCyliders()
-Table()
+# MultipleCyliders()
+# Table()
 MultipleHandles()
 # ri.TransformBegin()
 # ri.Translate(0,3,0)
