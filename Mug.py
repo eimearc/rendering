@@ -312,10 +312,10 @@ class HandleVerts():
 
 	def __edge_loop__(self,x1,y1,x2,y2,z):
 		return [
-			x1, y1, -z,
-			x2, y2, -z,
+			x1, y1, z,
 			x2, y2, z,
-			x1, y1, z
+			x2, y2, -z,
+			x1, y1, -z
 		]
 
 	def __init__(self, x1, y1, x2, y2, z, index, sharpness):
@@ -336,6 +336,16 @@ class HandleVerts():
 
 def Mug(height=4.5, radius=2):
 	ri = prman.Ri()
+	ri.AttributeBegin()
+	ri.Attribute( 'identifier',{ 'name' :'mug'})
+	ri.Bxdf('PxrSurface', 'plastic',{
+			'color diffuseColor' : [.8, .8, .8],
+			'color specularEdgeColor' : [1, 1 , 1],
+			'color clearcoatFaceColor' : [.1, .1, .1], 
+			'color clearcoatEdgeColor' : [.1, .1, .1],
+			'float clearcoatRoughness' : 0.01,
+			'float clearcoatThickness' : 1,
+	})
 	cylinder = Cylinder()
 	cylinder.draw()
 	ri.TransformBegin()
@@ -343,6 +353,7 @@ def Mug(height=4.5, radius=2):
 	handle = Handle(height=height/4.5)
 	handle.draw()
 	ri.TransformEnd()
+	ri.AttributeEnd()
 
 def HalfHandle(x,y,z,sharpness,thickness,sign=1,start_index=0,reverse=False,height=2):
 	X_BASE = x
@@ -479,7 +490,7 @@ filename = "Mug.rib"
 # make RI calls after this function else we get a core dump
 ri.Begin("__render") #filename)
 ri.Integrator ('PxrPathTracer' ,'integrator')
-# ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "shaded"}, {"normalCheck": 1})
+# ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "normals"}, {"normalCheck": 0})
 
 ri.Option('searchpath', {'string texture':'./textures/:@'})
 ri.Hider('raytrace' ,{'int incremental' :[1]})
@@ -495,7 +506,7 @@ ri.Projection(ri.PERSPECTIVE,{ri.FOV:40})
 ri.WorldBegin()
 
 # Camera transformation
-ri.Translate(0,-3,0)
+ri.Translate(0,-2,0)
 ri.Translate(0,0,20)
 ri.Rotate(-20,1,0,0)
 
