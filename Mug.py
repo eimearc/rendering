@@ -208,34 +208,32 @@ def Cylinder(radius=0.5, height=1.0):
 	edgeloops  = [val for sublist in verts_list for val in sublist.edge_loop]
 	verts = [val for sublist in verts_list for val in sublist.verts]
 
-	# indices = [
-	# 	0,1,2,3
-	# ]
-	indices = []
-	nfaces = 0
+	indices = [
+		0,1,2,3,4,5
+	]
+	nverts = [6]
 	for i in range(len(verts_list)-1):
 		print("Creating faceloop for " + str(i))
 		indices = indices + CreateFaceLoop(i)
-		nfaces += 6
+		nverts += [4]*6
 
 	# Add final face for inside bottom.
 	i = verts_list[len(verts_list)-1].index * NUM_CYLINDER_VERTS
 	print("last index:" + str(i))
-	# indices = indices + [i+1,i,i+3,i+2]
+	indices += [i+1,i,i+3,i+2,i+5,i+4]
+	nverts += [6]
 
 	num = len(verts_list)
 	tags = [ri.CREASE]*num
 	nargs = [NUM_CYLINDER_VERTS+1,1]*num
 	floatargs = [v.sharpness for v in verts_list]
 	# nfaces = len(indices)/(NUM_CYLINDER_VERTS)
-	nverts = [4]*nfaces
 
 	print("")
 	print("indices:" + str(len(indices)/(4)) + " --> " + str(len(indices)))
 	print("nargs: " + str(len(nargs)))
 	print("edgeloops: " + str(len(edgeloops)))
 	print("floatargs: " + str(len(floatargs)))
-	print("nfaces:" + str(nfaces))
 	print("number of verts:" + str(len(verts)/3.0) + " --> " + str(len(verts)))
 	print("nverts: " + str(len(nverts)))
 
