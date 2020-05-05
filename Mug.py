@@ -313,12 +313,13 @@ class HandleVerts():
 	def __edge_loop__(self,x1,y1,x2,y2,z1,z2):
 		return [
 			x1, y1, z1,
-			x2, y2, z1,
 			x2, y2, z2,
-			x1, y1, z2
+			x2, y2, -z2,
+			x1, y1, -z1
 		]
 
-	def __init__(self, x1, y1, x2, y2, z1, z2, index, sharpness):
+	def __init__(self, x1, y1, x2, y2, z1, z2, index, sharpness, z_fan=1.0):
+		z2 = z1*z_fan
 		self.index = index
 		self.verts = self.__edge_loop__(x1,y1,x2,y2,z1,z2)
 		self.index = index
@@ -350,7 +351,7 @@ def Mug(height=4.5, radius=2):
 	cylinder.draw()
 	ri.TransformBegin()
 	ri.Translate(2.1,2.4,0)
-	handle = Handle(height=height/4.5)
+	handle = Handle(height=height/5)
 	handle.draw()
 	ri.TransformEnd()
 	ri.AttributeEnd()
@@ -359,28 +360,28 @@ def HalfHandle(x,y,z,sharpness,thickness,sign=1,start_index=0,reverse=False,heig
 	X_BASE = x
 	Y_BASE = y
 	Z_BASE = z
-	SHARPNESS=sharpness
+	SHARPNESS=10
 	THICKNESS=thickness
 
 	verts_list = []
 	i = start_index
 
-	x=X_BASE*0.5*-1
+	x=X_BASE*0.45*-1
 	y=(Y_BASE*0.8)*sign
-	z=Z_BASE
-	verts_list.append(HandleVerts(x,y,x-THICKNESS,y,z,-z,i,SHARPNESS))
+	z=Z_BASE*0.7
+	verts_list.append(HandleVerts(x,y,x-THICKNESS,y,z,-z,i,SHARPNESS,z_fan=1.05))
 	i += 1
 
 	x=X_BASE*0.5*-1
-	y=(Y_BASE+0.5*height)*sign
+	y=(Y_BASE+0.8*height)*sign
 	z=Z_BASE
-	verts_list.append(HandleVerts(x,y,x-2.5*THICKNESS,y+2*THICKNESS*sign,z,-z,i,SHARPNESS))
+	verts_list.append(HandleVerts(x,y,x-2.6*THICKNESS,y+2.8*THICKNESS*sign,z,-z,i,SHARPNESS,z_fan=1.05))
 	i += 1
 
-	x=0
-	y=(Y_BASE+height)*sign
+	x=X_BASE*0.2
+	y=(Y_BASE+1.2*height)*sign
 	z=Z_BASE
-	verts_list.append(HandleVerts(x,y,x,y+THICKNESS*sign,z,-z,i,SHARPNESS))
+	verts_list.append(HandleVerts(x,y,x,y+1.5*THICKNESS*sign,z,-z,i,SHARPNESS))
 	i += 1
 
 	x=X_BASE*0.7
@@ -403,7 +404,7 @@ def Handle(width=1, height=2, center_y=0.5):
 	Y_BASE=height/2.0
 	Z_BASE=0.5
 	SHARPNESS=0.0
-	THICKNESS=height/5.0
+	THICKNESS=height/4.7
 
 	verts_list = HalfHandle(X_BASE, Y_BASE, Z_BASE, SHARPNESS, thickness=THICKNESS, height=height)
 
@@ -420,6 +421,8 @@ def Handle(width=1, height=2, center_y=0.5):
 
 	verts = [val for sublist in verts_list for val in sublist.verts]
 
+	# TODO: Change this to take sharpness from edges.
+
 	tmpedgeloops = []
 	tmpnargs = []
 	tmpfloatargs = []
@@ -431,6 +434,8 @@ def Handle(width=1, height=2, center_y=0.5):
 		tmpedgeloops = tmpedgeloops + edgeloop
 		tmpnargs = tmpnargs + [len(edgeloop),1]
 		tmpfloatargs.append(SHARPNESS) # Sharpness
+
+	print("floatargs:" + str(tmpfloatargs))
 
 	Z_BASE = width/2.0
 
@@ -489,8 +494,8 @@ filename = "Mug.rib"
 # this is the begining of the rib archive generation we can only
 # make RI calls after this function else we get a core dump
 ri.Begin("__render") #filename)
-# ri.Integrator ('PxrPathTracer' ,'integrator')
-ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "shaded"}, {"normalCheck": 0})
+ri.Integrator ('PxrPathTracer' ,'integrator')
+# ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "shaded"}, {"normalCheck": 0})
 
 ri.Option('searchpath', {'string texture':'./textures/:@'})
 ri.Hider('raytrace' ,{'int incremental' :[1]})
@@ -517,7 +522,7 @@ ri.Declare('domeLight' ,'string')
 ri.Rotate(-90,1,0,0)
 ri.Rotate(100,0,0,1)
 ri.Light( 'PxrDomeLight', 'domeLight', { 
-          'string lightColorMap'  : 'Luxo-Jr_4000x2000.tex'
+		  'string lightColorMap'  : 'lebombo_4k.tex'
   })
 ri.AttributeEnd()
 ri.TransformEnd()
