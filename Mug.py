@@ -47,8 +47,9 @@ class Verts():
 	index = 0
 	edge_loop = []
 	sharpness = 0.0
+	voffset = 0.0
 
-	def __init__(self, x, y, z, index, sharpness):
+	def __init__(self, x, y, z, index, sharpness, voffset=0.5):
 		self.index = index
 		self.y = y
 		self.verts = Square(x,y,z,10)
@@ -56,6 +57,7 @@ class Verts():
 		self.indices = [(index*NUM_CYLINDER_VERTS + i) for i in range(NUM_CYLINDER_VERTS)]
 		self.edge_loop = [(index*NUM_CYLINDER_VERTS + i) for i in (range(NUM_CYLINDER_VERTS)+[0])]
 		self.sharpness = sharpness
+		self.voffset = voffset
 
 	def __str__(self):
 		return str("Verts\n") + \
@@ -64,7 +66,8 @@ class Verts():
 			"\n\ty: " + str(self.y) + \
 			"\n\tindex: " + str(self.index) + \
 			"\n\tedge_loop: " + str(self.edge_loop) + \
-			"\n\tsharpness: " + str(self.sharpness)
+			"\n\tsharpness: " + str(self.sharpness) + \
+			"\n\tvoffset: " + str(self.voffset)
 		
 def Cylinder(radius=2, height=4.5):
 	X_BASE=math.sqrt((radius*radius)/1.5)
@@ -73,6 +76,7 @@ def Cylinder(radius=2, height=4.5):
 
 	DEFAULT_SHARPNESS=1.85
 	i = 0
+	inc = 0.01
 
 	verts_list = []
 
@@ -209,13 +213,11 @@ def Cylinder(radius=2, height=4.5):
 	]
 	nverts = [4]
 	for i in range(len(verts_list)-1):
-		print("Creating faceloop for " + str(i))
 		indices = indices + CreateFaceLoop(i)
 		nverts += [4]*4
 
 	# Add final face for inside bottom.
 	i = verts_list[len(verts_list)-1].index * NUM_CYLINDER_VERTS
-	print("last index:" + str(i))
 	indices += [i+1,i,i+3,i+2]
 	nverts += [4]
 
@@ -223,17 +225,28 @@ def Cylinder(radius=2, height=4.5):
 	tags = [ri.CREASE]*num
 	nargs = [NUM_CYLINDER_VERTS+1,1]*num
 	floatargs = [v.sharpness for v in verts_list]
-	# nfaces = len(indices)/(NUM_CYLINDER_VERTS)
+	uv = [
+		0.0,0.0,
+		0.25,0.0,
+		0.75,0.0,
+		1,0.0,
+		0.0,0.5,
+		0.25,0.5,
+		0.75,0.5,
+		1,0.5,
+		0.0,1.0,
+		0.25,1.0,
+		0.75,1.0,
+		1,1.0
+	]
+	voffset_tmp = [uv for v in verts_list]
+	print (len(verts)/3)/4
+	voffset_tmp = [uv]*(len(verts_list)/3)
+	voffset = []
+	for sublist in voffset_tmp:
+		voffset += sublist
 
-	print("")
-	print("indices:" + str(len(indices)/(4)) + " --> " + str(len(indices)))
-	print("nargs: " + str(len(nargs)))
-	print("edgeloops: " + str(len(edgeloops)))
-	print("floatargs: " + str(len(floatargs)))
-	print("number of verts:" + str(len(verts)/3.0) + " --> " + str(len(verts)))
-	print("nverts: " + str(len(nverts)))
-
-	return Component(nverts, indices, tags, nargs, edgeloops, floatargs, verts)
+	return Component(nverts, indices, tags, nargs, edgeloops, floatargs, verts, voffset)
 
 class Component():
 	nverts = []
@@ -243,8 +256,9 @@ class Component():
 	intargs = []
 	floatargs = []
 	verts = []
+	voffset = []
 
-	def __init__(self, nverts, indices, tags, nargs, intargs, floatargs, verts):
+	def __init__(self, nverts, indices, tags, nargs, intargs, floatargs, verts, voffset):
 		self.nverts = nverts
 		self.indices = indices
 		self.tags = tags
@@ -252,10 +266,11 @@ class Component():
 		self.intargs = intargs
 		self.floatargs = floatargs
 		self.verts = verts
+		self.voffset = voffset
 
 	def draw(self):
 		ri.SubdivisionMesh("catmull-clark",
-			self.nverts, self.indices, self.tags, self.nargs, self.intargs, self.floatargs, {ri.P: self.verts})
+			self.nverts, self.indices, self.tags, self.nargs, self.intargs, self.floatargs, {ri.P: self.verts, ri.ST: self.voffset})
 
 	def add(self, other):
 		self.nverts += other.nverts
@@ -266,6 +281,7 @@ class Component():
 		self.intargs += [i+start_index for i in other.intargs]
 		self.floatargs += other.floatargs
 		self.verts += other.verts
+		self.voffset += other.voffset
 
 def Bump():
 	expr="""
@@ -368,15 +384,52 @@ def Mug(height=4.5, radius=2):
 		'float frequency': [40.0]
 	})
 
-	# ri.Pattern("mug", "noiseShader", {"color Cin"  : [1.0,1.0,1.0]})
+	colorVarience = """
+	$val=noise($P);
+	$color=ccurve($val,  
+		0.000, $base, 4,  
+		0.590, $base*$fraction, 4);
+	$color
+	"""
+	ri.Pattern('PxrSeExpr', 'seColorVariance',
+	{
+		'color base' : [1.0,1.0,1.0],
+		'float fraction' : [0.9], 
+		'string expression' : [colorVarience]
+	})
+
+	# Function: y = 2x;
+	scratch = """
+	$x = $P[0];
+	$y = $P[1];
+	$a = [1,0,0];
+	$b = [0,0,0];
+
+	$repeatcount=6; #0, 100;
+	$ss=$u+noise([$x,$y,0]*5)*0.5;
+	$tt=$v+noise([$x,$y,0]*5+[100,100,100])*0.5;
+	$cc=ccellnoise([$ss*$repeatcount,$tt*$repeatcount,0]);
+
+	$color=voronoi($P,5,1.0,0,8,2,0.5);
+	if ($y>=1.0)
+	{
+		$color=[hash(1.77),0.0,0.0];
+	}
+	$color
+	"""
+	ri.Pattern('PxrSeExpr', 'seScratch',
+	{
+		'string expression' : [scratch]
+	})
+
 	ri.Displace('PxrDisplace', 'displaceTexture',
 	{   
 		'reference float dispScalar' : ['voronoise:resultF'],
 		'uniform float dispAmount' : [0.005],
 	})
 	ri.Bxdf('PxrSurface', 'plastic',{
-		# 'reference color diffuseColor' : ['voronoise:resultRGB'],
-		'color diffuseColor' : [0.8, 0.8, 0.8],
+		# 'reference color diffuseColor' : ['seColorVariance:resultRGB'],
+		'reference color diffuseColor' : ['seScratch:resultRGB'],
 		'color specularEdgeColor' : [1, 1 , 1],
 		'color clearcoatFaceColor' : [.1, .1, .1], 
 		'color clearcoatEdgeColor' : [.1, .1, .1],
@@ -389,7 +442,7 @@ def Mug(height=4.5, radius=2):
 	ri.TransformBegin()
 	ri.Translate(2.1,2.4,0)
 	handle = Handle(height=height/5)
-	handle.draw()
+	# handle.draw()
 	ri.TransformEnd()
 	ri.AttributeEnd()
 
@@ -472,8 +525,6 @@ def Handle(width=1, height=2, center_y=0.5):
 		tmpnargs = tmpnargs + [len(edgeloop),1]
 		tmpfloatargs.append(SHARPNESS) # Sharpness
 
-	print("floatargs:" + str(tmpfloatargs))
-
 	Z_BASE = width/2.0
 
 	indices = [
@@ -491,7 +542,7 @@ def Handle(width=1, height=2, center_y=0.5):
 	nverts = [4]*nfaces
 	ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, tmpedgeloops, floatargs, {ri.P: verts})
 
-	return Component(nverts, indices, tags, nargs, tmpedgeloops, floatargs, verts)
+	# return Component(nverts, indices, tags, nargs, tmpedgeloops, floatargs, verts)
 
 def MultipleHandles():
 	ri.TransformBegin()
@@ -531,26 +582,27 @@ filename = "Mug.rib"
 # this is the begining of the rib archive generation we can only
 # make RI calls after this function else we get a core dump
 ri.Begin("__render") #filename)
-ri.Integrator ('PxrPathTracer' ,'integrator')
-# ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "st"}, {"normalCheck": 0})
+# ri.Integrator ('PxrPathTracer' ,'integrator')
+ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "st"}, {"normalCheck": 0})
 
-ri.Attribute('displacementbound', {'float sphere' : [10], ri.COORDINATESYSTEM:"object"})
+ri.Attribute('displacementbound', {'float sphere' : [1], ri.COORDINATESYSTEM:"object"})
 ri.Option('searchpath', {'string texture':'./textures/:@'})
 ri.Hider('raytrace' ,{'int incremental' :[1]})
 ri.ShadingRate(10)
-ri.PixelVariance(0.1)
+ri.PixelVariance(1)
 # ArchiveRecord is used to add elements to the rib stream in this case comments
 # now we add the display element using the usual elements
 # FILENAME DISPLAY Type Output format
 ri.Display("Mug.exr", "it", "rgba")
 # Specify PAL resolution 1:1 pixel Aspect ratio
 ri.Format(720,576,1)
+# ri.Format(1080,720,1)
 ri.Projection(ri.PERSPECTIVE,{ri.FOV:40}) 
 ri.WorldBegin()
 
 # Camera transformation
 ri.Translate(0,-1.5,0)
-ri.Translate(0,0,10)
+ri.Translate(0,0,20)
 ri.Rotate(-20,1,0,0)
 
 # Lighting
