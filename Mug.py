@@ -270,11 +270,13 @@ class Component():
 def Bump():
 	expr="""
 	$colour = c1;
-	$c = floor( 10 * $u ) +floor( 10 * $v );
+	$c = floor( 10 * $u ) + floor( 10 * $v );
+
 	if( fmod( $c, 2.0 ) < 1.0 )
 	{
 		$colour=c2;
 	}
+
 	$colour
 	"""
 	return expr
@@ -351,15 +353,22 @@ def Mug(height=4.5, radius=2):
 	ri = prman.Ri()
 	ri.AttributeBegin()
 	ri.Attribute( 'identifier',{ 'name' :'mug'})
+	# ri.Attribute('trace', {'int displacements' : [1]})
 
 	expr = Bump()
 	ri.Pattern( 'PxrSeExpr' ,'seTexture',
 	{
-		'color c1' : [1,1,1],
-		'color c2' : [1,0,0],
+		'float c1' : [1],
+		'float c2' : [0],
 		'string expression' : [expr]
 	})
 
+	ri.Pattern("mug","noiseShader", {"color Cin"  : [1.0,1.0,1.0]})
+	ri.Displace('PxrDisplace', 'displaceTexture',
+	{   
+		'reference float dispScalar' : ['seTexture:resultF'],
+		'uniform float dispAmount' : [0.01],
+	})
 	ri.Bxdf('PxrSurface', 'plastic',{
 		'reference color diffuseColor' : ['seTexture:resultRGB'],
 		'color specularEdgeColor' : [1, 1 , 1],
@@ -517,8 +526,9 @@ filename = "Mug.rib"
 # make RI calls after this function else we get a core dump
 ri.Begin("__render") #filename)
 ri.Integrator ('PxrPathTracer' ,'integrator')
-# ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "shaded"}, {"normalCheck": 0})
+# ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "st"}, {"normalCheck": 0})
 
+ri.Attribute('displacementbound', {'float sphere' : [10], ri.COORDINATESYSTEM:"object"})
 ri.Option('searchpath', {'string texture':'./textures/:@'})
 ri.Hider('raytrace' ,{'int incremental' :[1]})
 ri.ShadingRate(10)
@@ -533,7 +543,7 @@ ri.Projection(ri.PERSPECTIVE,{ri.FOV:40})
 ri.WorldBegin()
 
 # Camera transformation
-ri.Translate(0,-1,0)
+ri.Translate(0,-1.5,0)
 ri.Translate(0,0,10)
 ri.Rotate(-20,1,0,0)
 
