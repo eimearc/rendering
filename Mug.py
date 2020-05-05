@@ -99,8 +99,8 @@ def getUVCoords(verts=None):
 	uvs=[
 		0.0,0.0,
 		0.25,0.0,
-		0.75,0.0,
-		1,0.0
+		0.5,0.0,
+		0.75,0.0
 	]
 
 	distance_so_far = 0
@@ -114,14 +114,14 @@ def getUVCoords(verts=None):
 		print(distance(v1,v2),distance_so_far, full_dist, f)
 		uvs += [0.0,f]
 		uvs += [0.25,f]
+		uvs += [0.5,f]
 		uvs += [0.75,f]
-		uvs += [1.0,f]
 
 	uvs += [
 		0.0,1.0,
 		0.25,1.0,
-		0.75,1.0,
-		1,1.0
+		0.5,1.0,
+		0.75,1.0
 	]
 	print("Len:", (len(uvs)/4)/2)
 	return uvs
@@ -284,26 +284,6 @@ def Cylinder(radius=2, height=4.5):
 	tags = [ri.CREASE]*num
 	nargs = [NUM_CYLINDER_VERTS+1,1]*num
 	floatargs = [v.sharpness for v in verts_list]
-	uv = [
-		0.0,0.0,
-		0.25,0.0,
-		0.75,0.0,
-		1,0.0,
-		0.0,0.5,
-		0.25,0.5,
-		0.75,0.5,
-		1,0.5,
-		0.0,1.0,
-		0.25,1.0,
-		0.75,1.0,
-		1,1.0
-	]
-	voffset_tmp = [uv for v in verts_list]
-	print (len(verts)/3)/4
-	voffset_tmp = [uv]*(len(verts_list)/3)
-	voffset = []
-	for sublist in voffset_tmp:
-		voffset += sublist
 
 	return Component(nverts, indices, tags, nargs, edgeloops, floatargs, verts, uvs)
 
@@ -328,6 +308,11 @@ class Component():
 		self.voffset = voffset
 
 	def draw(self):
+		print("voffset",self.voffset)
+		i = 0
+		for v in range(len(self.voffset)):
+			if v % 2 == 1:
+				print self.voffset[v]
 		ri.SubdivisionMesh("catmull-clark",
 			self.nverts, self.indices, self.tags, self.nargs, self.intargs, self.floatargs, {ri.P: self.verts, ri.ST: self.voffset})
 
@@ -345,7 +330,7 @@ class Component():
 def Bump():
 	expr="""
 	$colour = c1;
-	$c = floor( 3 * $u ) + floor( 3 * $v );
+	$c = floor( 10 * $s ) + floor( 10 * $t );
 	if( fmod( $c, 2.0 ) < 1.0 )
 	{
 		$colour=c2;
@@ -488,7 +473,8 @@ def Mug(height=4.5, radius=2):
 	})
 	ri.Bxdf('PxrSurface', 'plastic',{
 		# 'reference color diffuseColor' : ['seColorVariance:resultRGB'],
-		'reference color diffuseColor' : ['seScratch:resultRGB'],
+		# 'reference color diffuseColor' : ['seScratch:resultRGB'],
+		'reference color diffuseColor' : ['seTexture:resultRGB'],
 		'color specularEdgeColor' : [1, 1 , 1],
 		'color clearcoatFaceColor' : [.1, .1, .1], 
 		'color clearcoatEdgeColor' : [.1, .1, .1],
@@ -628,9 +614,9 @@ def MultipleMugs():
 
 	ri.TransformBegin()
 	ri.Translate(-6,1.5,-2)
-	ri.Rotate(-120,0,1,0)
+	ri.Rotate(-110,0,1,0)
 	ri.Rotate(-110,1,0,0)
-	ri.Rotate(90,0,0,1)
+	ri.Rotate(100,0,0,1)
 	Mug()
 	ri.TransformEnd()
 
@@ -641,8 +627,8 @@ filename = "Mug.rib"
 # this is the begining of the rib archive generation we can only
 # make RI calls after this function else we get a core dump
 ri.Begin("__render") #filename)
-# ri.Integrator ('PxrPathTracer' ,'integrator')
-ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "st"}, {"normalCheck": 0})
+ri.Integrator ('PxrPathTracer' ,'integrator')
+# ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "st"}, {"normalCheck": 0})
 
 ri.Attribute('displacementbound', {'float sphere' : [1], ri.COORDINATESYSTEM:"object"})
 ri.Option('searchpath', {'string texture':'./textures/:@'})
@@ -676,7 +662,7 @@ ri.Light( 'PxrDomeLight', 'domeLight', {
 ri.AttributeEnd()
 ri.TransformEnd()
 
-Table()
+# Table()
 MultipleMugs()
 
 ri.WorldEnd()
