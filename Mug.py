@@ -267,6 +267,18 @@ class Component():
 		self.floatargs += other.floatargs
 		self.verts += other.verts
 
+def Bump():
+	expr="""
+	$colour = c1;
+	$c = floor( 10 * $u ) +floor( 10 * $v );
+	if( fmod( $c, 2.0 ) < 1.0 )
+	{
+		$colour=c2;
+	}
+	$colour
+	"""
+	return expr
+
 def MultipleCyliders():
 	height = 4.5
 	radius = 2
@@ -275,7 +287,7 @@ def MultipleCyliders():
 	ri.Attribute( 'identifier',{ 'name' :'cylinders'})
 	ri.Bxdf('PxrSurface', 'plastic',{
 			'color diffuseColor' : [.8, .8, .8],
-			'color specularEdgeColor' : [1, 1 , 1],
+			'color specularEdgeColor' : [1, 1, 1],
 			'color clearcoatFaceColor' : [.1, .1, .1], 
 			'color clearcoatEdgeColor' : [.1, .1, .1],
 			'float clearcoatRoughness' : 0.01,
@@ -339,14 +351,24 @@ def Mug(height=4.5, radius=2):
 	ri = prman.Ri()
 	ri.AttributeBegin()
 	ri.Attribute( 'identifier',{ 'name' :'mug'})
-	ri.Bxdf('PxrSurface', 'plastic',{
-			'color diffuseColor' : [.8, .8, .8],
-			'color specularEdgeColor' : [1, 1 , 1],
-			'color clearcoatFaceColor' : [.1, .1, .1], 
-			'color clearcoatEdgeColor' : [.1, .1, .1],
-			'float clearcoatRoughness' : 0.01,
-			'float clearcoatThickness' : 1,
+
+	expr = Bump()
+	ri.Pattern( 'PxrSeExpr' ,'seTexture',
+	{
+		'color c1' : [1,1,1],
+		'color c2' : [1,0,0],
+		'string expression' : [expr]
 	})
+
+	ri.Bxdf('PxrSurface', 'plastic',{
+		'reference color diffuseColor' : ['seTexture:resultRGB'],
+		'color specularEdgeColor' : [1, 1 , 1],
+		'color clearcoatFaceColor' : [.1, .1, .1], 
+		'color clearcoatEdgeColor' : [.1, .1, .1],
+		'float clearcoatRoughness' : 0.01,
+		'float clearcoatThickness' : 1,
+	})
+
 	cylinder = Cylinder()
 	cylinder.draw()
 	ri.TransformBegin()
@@ -511,8 +533,8 @@ ri.Projection(ri.PERSPECTIVE,{ri.FOV:40})
 ri.WorldBegin()
 
 # Camera transformation
-ri.Translate(0,-2,0)
-ri.Translate(0,0,20)
+ri.Translate(0,-1,0)
+ri.Translate(0,0,10)
 ri.Rotate(-20,1,0,0)
 
 # Lighting
