@@ -68,6 +68,65 @@ class Verts():
 			"\n\tedge_loop: " + str(self.edge_loop) + \
 			"\n\tsharpness: " + str(self.sharpness) + \
 			"\n\tvoffset: " + str(self.voffset)
+
+	def v(self, i):
+		return self.verts[i]
+
+def distance(v1,v2):
+	x_dist = v2[0]-v1[0]
+	y_dist = v2[1]-v1[1]
+	z_dist = v2[2]-v1[2]
+	return math.sqrt(x_dist**2 + y_dist**2 + z_dist**2)
+
+def getUVCoords(verts=None):
+	x_index = 0
+	y_index = 1
+	z_index = 2
+	u_step = 0.25
+	full_dist = 0.0
+	v1 = []
+	v2 = []
+	print("Getting UV Coords")
+	print(verts)
+	for i in range(0,len(verts)-1):
+		va = verts[i]
+		vb = verts[i+1]
+		v1 = [va.verts[0],va.verts[1],va.verts[2]]
+		v2 = [vb.verts[0],vb.verts[1],vb.verts[2]]
+		print(i, distance(v1,v2))
+		full_dist+=distance(v1,v2)
+
+	uvs=[
+		0.0,0.0,
+		0.25,0.0,
+		0.75,0.0,
+		1,0.0
+	]
+
+	distance_so_far = 0
+	for i in range(1,len(verts)-1):
+		va = verts[i]
+		vb = verts[i-1]
+		v1 = [va.verts[0],va.verts[1],va.verts[2]]
+		v2 = [vb.verts[0],vb.verts[1],vb.verts[2]]
+		distance_so_far+=distance(v1,v2)
+		f = distance_so_far/full_dist
+		print(distance(v1,v2),distance_so_far, full_dist, f)
+		uvs += [0.0,f]
+		uvs += [0.25,f]
+		uvs += [0.75,f]
+		uvs += [1.0,f]
+
+	uvs += [
+		0.0,1.0,
+		0.25,1.0,
+		0.75,1.0,
+		1,1.0
+	]
+	print("Len:", (len(uvs)/4)/2)
+	return uvs
+
+
 		
 def Cylinder(radius=2, height=4.5):
 	X_BASE=math.sqrt((radius*radius)/1.5)
@@ -76,7 +135,6 @@ def Cylinder(radius=2, height=4.5):
 
 	DEFAULT_SHARPNESS=1.85
 	i = 0
-	inc = 0.01
 
 	verts_list = []
 
@@ -207,6 +265,7 @@ def Cylinder(radius=2, height=4.5):
 
 	edgeloops  = [val for sublist in verts_list for val in sublist.edge_loop]
 	verts = [val for sublist in verts_list for val in sublist.verts]
+	uvs = getUVCoords(verts_list)
 
 	indices = [
 		0,1,2,3
@@ -246,7 +305,7 @@ def Cylinder(radius=2, height=4.5):
 	for sublist in voffset_tmp:
 		voffset += sublist
 
-	return Component(nverts, indices, tags, nargs, edgeloops, floatargs, verts, voffset)
+	return Component(nverts, indices, tags, nargs, edgeloops, floatargs, verts, uvs)
 
 class Component():
 	nverts = []
