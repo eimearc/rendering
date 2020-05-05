@@ -365,17 +365,18 @@ def Mug(height=4.5, radius=2):
 	{
 		'float jitter': [1.0],
 		'float smoothness': [0.0],
-		'float frequency': [10.0]
+		'float frequency': [40.0]
 	})
 
-	ri.Pattern("mug", "noiseShader", {"color Cin"  : [1.0,1.0,1.0]})
-	# ri.Displace('PxrDisplace', 'displaceTexture',
-	# {   
-	# 	'reference float dispScalar' : ['seTexture:resultF'],
-	# 	'uniform float dispAmount' : [0.1],
-	# })
+	# ri.Pattern("mug", "noiseShader", {"color Cin"  : [1.0,1.0,1.0]})
+	ri.Displace('PxrDisplace', 'displaceTexture',
+	{   
+		'reference float dispScalar' : ['voronoise:resultF'],
+		'uniform float dispAmount' : [0.005],
+	})
 	ri.Bxdf('PxrSurface', 'plastic',{
-		'reference color diffuseColor' : ['voronoise:resultRGB'],
+		# 'reference color diffuseColor' : ['voronoise:resultRGB'],
+		'color diffuseColor' : [0.8, 0.8, 0.8],
 		'color specularEdgeColor' : [1, 1 , 1],
 		'color clearcoatFaceColor' : [.1, .1, .1], 
 		'color clearcoatEdgeColor' : [.1, .1, .1],
