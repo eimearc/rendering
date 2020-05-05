@@ -270,13 +270,11 @@ class Component():
 def Bump():
 	expr="""
 	$colour = c1;
-	$c = floor( 10 * $u ) + floor( 10 * $v );
-
+	$c = floor( 3 * $u ) + floor( 3 * $v );
 	if( fmod( $c, 2.0 ) < 1.0 )
 	{
 		$colour=c2;
 	}
-
 	$colour
 	"""
 	return expr
@@ -362,15 +360,22 @@ def Mug(height=4.5, radius=2):
 		'float c2' : [0],
 		'string expression' : [expr]
 	})
-
-	ri.Pattern("mug","noiseShader", {"color Cin"  : [1.0,1.0,1.0]})
-	ri.Displace('PxrDisplace', 'displaceTexture',
-	{   
-		'reference float dispScalar' : ['seTexture:resultF'],
-		'uniform float dispAmount' : [0.01],
+	
+	ri.Pattern('PxrVoronoise', 'voronoise',
+	{
+		'float jitter': [1.0],
+		'float smoothness': [0.0],
+		'float frequency': [10.0]
 	})
+
+	ri.Pattern("mug", "noiseShader", {"color Cin"  : [1.0,1.0,1.0]})
+	# ri.Displace('PxrDisplace', 'displaceTexture',
+	# {   
+	# 	'reference float dispScalar' : ['seTexture:resultF'],
+	# 	'uniform float dispAmount' : [0.1],
+	# })
 	ri.Bxdf('PxrSurface', 'plastic',{
-		'reference color diffuseColor' : ['seTexture:resultRGB'],
+		'reference color diffuseColor' : ['voronoise:resultRGB'],
 		'color specularEdgeColor' : [1, 1 , 1],
 		'color clearcoatFaceColor' : [.1, .1, .1], 
 		'color clearcoatEdgeColor' : [.1, .1, .1],
