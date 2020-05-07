@@ -10,14 +10,13 @@ surface scratch(
     float freq=1;
     point PP=transform("shader",P);
     PP*=4;
-
     for(i=0;i<8;i+=1)
     {   
         mag+=abs((float)noise("perlin",PP*freq))/freq;
         freq*=2.1;
     }   
 
-    mag=smoothstep(0,0.4,mag);
+    mag=smoothstep(0,0.35,mag);
     mag=clamp(mag, 0, 1);
 
     color sCols[5]={
@@ -31,25 +30,23 @@ surface scratch(
     PP*=0.25;
     float mask=(float)noise("uperlin",PP);
     mask+=(float)noise("uperlin",PP*1.1);
-    mask+=(float)noise("uperlin",PP*2.2)/2.2;
+    mask+=(float)noise("uperlin",PP*3.3)/2.0;
     mask=clamp(mask,0,1);
-    // mask+=(float)noise("uperlin",PP*4.4)/4.4;
-    // mask+=1;
-    // mask+=(float)noise("perlin",0.1);
-    // mask+=(float)noise("perlin",PP);
-    // mask+=(float)noise("perlin",P*2)/2;
-    // mask+=(float)noise("perlin",P*4.2)/4.2;
-    // mask+=0.6;
-    // mask+=(float)noise("perlin",P/2);
-    // mask=clamp(mask,0,1);
-    // mask+=(float)noise("perlin",P*1.1)/1.1;
-    // mask+=(float)noise("perlin",P*2.1)/2.1;
-    // mask+=(float)noise("perlin",P*3.2)/3.2;
-    // mask=1-mask;
-
-    // color c=(color)spline("catmull-rom",mag,sCols);
-    // c=clamp(c,0,1);
 
     color c=max(mag,mask);
-    Cout=c;
+
+    mag=0;
+    freq=1;
+    point uv = point(u,v,0);
+
+    uv=rotate(uv, 20, vector(0,0,0), vector(0,1,1));
+    float _s=uv[0];
+    float _t=uv[1];
+
+
+    mag+=abs((float)noise("perlin",_s*0.1,_t*20));
+    freq*=2.1;
+    mag=clamp(mag,0,1);
+    mag=smoothstep(0,0.015,mag);
+    Cout=mag;
 }
