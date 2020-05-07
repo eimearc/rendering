@@ -1,0 +1,8 @@
+surface mug(
+    color Cin=1,
+    output color Cout=1,
+    float scaleU=5,
+    float scaleV=5)
+{
+    Cout=(float)noise("uperlin",u*scaleU,v*scaleV)*Cin;
+}

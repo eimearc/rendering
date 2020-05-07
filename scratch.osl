@@ -1,0 +1,19 @@
+surface scratch(
+    float s = 0 [[int lockgeom = 0]], // Use s attached to geo.
+    float t = 0 [[int lockgeom = 0]], // Use t attached to geo.
+    color Cin=1,
+    output color Cout=1
+)
+{
+    float u_repeat = 30;
+    float v_repeat = 10;
+    Cout=(float)noise("uperlin",u*u_repeat,v*v_repeat)*Cin;
+
+    // color colour = Cin;
+	// color c = floor( 5 * s ) + floor( 5 * t );
+	// if( fmod( c[0], 2.0 ) < 1.0 )
+	// {
+	// 	colour=color(0,0,0);
+	// }
+	// Cout = colour;
+}

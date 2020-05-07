@@ -86,14 +86,11 @@ def getUVCoords(verts=None):
 	full_dist = 0.0
 	v1 = []
 	v2 = []
-	print("Getting UV Coords")
-	print(verts)
 	for i in range(0,len(verts)-1):
 		va = verts[i]
 		vb = verts[i+1]
 		v1 = [va.verts[0],va.verts[1],va.verts[2]]
 		v2 = [vb.verts[0],vb.verts[1],vb.verts[2]]
-		print(i, distance(v1,v2))
 		full_dist+=distance(v1,v2)
 
 	uvs=[
@@ -111,7 +108,6 @@ def getUVCoords(verts=None):
 		v2 = [vb.verts[0],vb.verts[1],vb.verts[2]]
 		distance_so_far+=distance(v1,v2)
 		f = distance_so_far/full_dist
-		print(distance(v1,v2),distance_so_far, full_dist, f)
 		uvs += [0.0,f]
 		uvs += [0.25,f]
 		uvs += [0.5,f]
@@ -123,7 +119,7 @@ def getUVCoords(verts=None):
 		0.5,1.0,
 		0.75,1.0
 	]
-	print("Len:", (len(uvs)/4)/2)
+
 	return uvs
 
 
@@ -280,6 +276,10 @@ def Cylinder(radius=2, height=4.5):
 	indices += [i+1,i,i+3,i+2]
 	nverts += [4]
 
+	updated_uvs = []
+	for i in indices:
+		updated_uvs += [uvs[2*i],uvs[(2*i)+1]]
+
 	num = len(verts_list)
 	tags = [ri.CREASE]*num
 	nargs = [NUM_CYLINDER_VERTS+1,1]*num
@@ -308,11 +308,7 @@ class Component():
 		self.voffset = voffset
 
 	def draw(self):
-		print("voffset",self.voffset)
-		i = 0
-		for v in range(len(self.voffset)):
-			if v % 2 == 1:
-				print self.voffset[v]
+		print(len(self.indices), len(self.voffset)/2)
 		ri.SubdivisionMesh("catmull-clark",
 			self.nverts, self.indices, self.tags, self.nargs, self.intargs, self.floatargs, {ri.P: self.verts, ri.ST: self.voffset})
 
@@ -466,16 +462,18 @@ def Mug(height=4.5, radius=2):
 		'string expression' : [scratch]
 	})
 
-	ri.Displace('PxrDisplace', 'displaceTexture',
-	{   
-		'reference float dispScalar' : ['voronoise:resultF'],
-		'uniform float dispAmount' : [0.005],
-	})
+	ri.Pattern('scratch', 'scratch', {'color Cin': [1.0,1.0,1.0]})
+
+	# ri.Displace('PxrDisplace', 'displaceTexture',
+	# {   
+	# 	'reference float dispScalar' : ['voronoise:resultF'],
+	# 	'uniform float dispAmount' : [0.001],
+	# })
 	ri.Bxdf('PxrSurface', 'plastic',{
 		# 'reference color diffuseColor' : ['seColorVariance:resultRGB'],
+		'reference color diffuseColor' : ['scratch:Cout'],
 		# 'reference color diffuseColor' : ['seScratch:resultRGB'],
-		'reference color diffuseColor' : ['seTexture:resultRGB'],
-		'color specularEdgeColor' : [1, 1 , 1],
+		# 'reference color diffuseColor' : ['seTexture:resultRGB'],
 		'color clearcoatFaceColor' : [.1, .1, .1], 
 		'color clearcoatEdgeColor' : [.1, .1, .1],
 		'float clearcoatRoughness' : 0.01,
@@ -634,7 +632,7 @@ ri.Attribute('displacementbound', {'float sphere' : [1], ri.COORDINATESYSTEM:"ob
 ri.Option('searchpath', {'string texture':'./textures/:@'})
 ri.Hider('raytrace' ,{'int incremental' :[1]})
 ri.ShadingRate(10)
-ri.PixelVariance(1)
+ri.PixelVariance(1.0)
 # ArchiveRecord is used to add elements to the rib stream in this case comments
 # now we add the display element using the usual elements
 # FILENAME DISPLAY Type Output format
@@ -662,8 +660,9 @@ ri.Light( 'PxrDomeLight', 'domeLight', {
 ri.AttributeEnd()
 ri.TransformEnd()
 
-# Table()
-MultipleMugs()
+Table()
+# MultipleMugs()
+Mug()
 
 ri.WorldEnd()
 ri.End()
