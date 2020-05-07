@@ -37,16 +37,28 @@ surface scratch(
 
     mag=0;
     freq=1;
-    point uv = point(u,v,0);
+    point uv = point(s,t,0);
 
-    uv=rotate(uv, 20, vector(0,0,0), vector(0,1,1));
+    uv=rotate(uv, 30, vector(0,0,0), vector(0,1,1));
     float _s=uv[0];
     float _t=uv[1];
 
+    float scratches1=abs((float)noise("perlin",_s*0.1,_t*40));
+    scratches1=smoothstep(0,0.0075,scratches1);
+    mask=(float)noise("uperlin",s*3,t*3);
+    mask+=(float)noise("uperlin",s*4,t*4);
+    mask*=mask;
+    mask=clamp(mask,0,1);
+    scratches1=max(mask,scratches1);
 
-    mag+=abs((float)noise("perlin",_s*0.1,_t*20));
-    freq*=2.1;
+    uv=rotate(uv, -40, vector(0,0,0), vector(0,1,1));
+    _s=uv[0];
+    _t=uv[1];
+
+    float scratches2=abs((float)noise("perlin",_s*0.1,_t*20));
+
+    // mag=min(scratches1,scratches2);
     mag=clamp(mag,0,1);
     mag=smoothstep(0,0.015,mag);
-    Cout=mag;
+    Cout=scratches1;
 }
