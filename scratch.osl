@@ -1,0 +1,55 @@
+surface scratch(
+    float s = 0 [[int lockgeom = 0]], // Use s attached to geo.
+    float t = 0 [[int lockgeom = 0]], // Use t attached to geo.
+    color Cin=1,
+    output color Cout=1,
+    output float mag=0
+)
+{
+    float i;
+    float freq=1;
+    point PP=transform("shader",P);
+    PP*=4;
+
+    for(i=0;i<8;i+=1)
+    {   
+        mag+=abs((float)noise("perlin",PP*freq))/freq;
+        freq*=2.1;
+    }   
+
+    mag=smoothstep(0,0.4,mag);
+    mag=clamp(mag, 0, 1);
+
+    color sCols[5]={
+        color("rgb",1.0,1.0,1.0),
+        color("rgb",1.0,1.0,1.0),
+        color("rgb",1.0,1.0,1.0),
+        color("rgb",1.0,1.0,1.0),
+        color("rgb",0.0,0.0,0.0)
+    };
+
+    PP*=0.25;
+    float mask=(float)noise("uperlin",PP);
+    mask+=(float)noise("uperlin",PP*1.1);
+    mask+=(float)noise("uperlin",PP*2.2)/2.2;
+    mask=clamp(mask,0,1);
+    // mask+=(float)noise("uperlin",PP*4.4)/4.4;
+    // mask+=1;
+    // mask+=(float)noise("perlin",0.1);
+    // mask+=(float)noise("perlin",PP);
+    // mask+=(float)noise("perlin",P*2)/2;
+    // mask+=(float)noise("perlin",P*4.2)/4.2;
+    // mask+=0.6;
+    // mask+=(float)noise("perlin",P/2);
+    // mask=clamp(mask,0,1);
+    // mask+=(float)noise("perlin",P*1.1)/1.1;
+    // mask+=(float)noise("perlin",P*2.1)/2.1;
+    // mask+=(float)noise("perlin",P*3.2)/3.2;
+    // mask=1-mask;
+
+    // color c=(color)spline("catmull-rom",mag,sCols);
+    // c=clamp(c,0,1);
+
+    color c=max(mag,mask);
+    Cout=c;
+}

@@ -5,7 +5,7 @@ SLEXT=oso
 
 SHADERNAME=mug
 
-SHADERS = mug.oso smudge.oso
+SHADERS = mug.oso smudge.oso scratch.oso
 
 .SUFFIXES: .osl .oso
 .osl.oso:
@@ -14,4 +14,4 @@ SHADERS = mug.oso smudge.oso
 all: ${SHADERS}
 
 clean :
-	rm -f ${SHADERNAME}.oso
+	rm -f *.oso

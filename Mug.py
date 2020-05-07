@@ -463,19 +463,23 @@ def Mug(height=4.5, radius=2):
 	})
 
 	ri.Pattern('smudge', 'smudge', {'color Cin': [1.0,1.0,1.0]})
+	ri.Pattern('scratch', 'scratch', {'color Cin': [1.0,1.0,1.0]})
 
 	# ri.Displace('PxrDisplace', 'displaceTexture',
 	# {   
 	# 	'reference float dispScalar' : ['voronoise:resultF'],
 	# 	'uniform float dispAmount' : [0.001],
 	# })
+
 	ri.Bxdf('PxrSurface', 'plastic',{
-		'reference color diffuseColor' : ['seColorVariance:resultRGB'],
+		# 'reference color diffuseColor' : ['seColorVariance:resultRGB'],
+		'reference color diffuseColor' : ['scratch:Cout'],
 		# 'reference color diffuseColor' : ['seScratch:resultRGB'],
 		# 'reference color diffuseColor' : ['seTexture:resultRGB'],
 		'color clearcoatFaceColor' : [.1, .1, .1], 
 		'color clearcoatEdgeColor' : [.1, .1, .1],
 		'reference float clearcoatRoughness' : ['smudge:mag'],
+		# 'float clearcoatRoughness' : 0.01,
 		'float clearcoatThickness' : 1,
 	})
 
@@ -624,18 +628,19 @@ filename = "Mug.rib"
 # this is the begining of the rib archive generation we can only
 # make RI calls after this function else we get a core dump
 ri.Begin("__render") #filename)
-ri.Integrator ('PxrPathTracer' ,'integrator')
+ri.Integrator('PxrPathTracer' ,'integrator')
 # ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "st"}, {"normalCheck": 0})
 
 ri.Attribute('displacementbound', {'float sphere' : [1], ri.COORDINATESYSTEM:"object"})
 ri.Option('searchpath', {'string texture':'./textures/:@'})
 ri.Hider('raytrace' ,{'int incremental' :[1]})
-ri.ShadingRate(0.1)
-ri.PixelVariance(0.001)
+ri.ShadingRate(10)
+ri.PixelVariance(1)
 # ArchiveRecord is used to add elements to the rib stream in this case comments
 # now we add the display element using the usual elements
 # FILENAME DISPLAY Type Output format
 ri.Display("Mug.exr", "it", "rgba")
+# ri.Display("Mug.exr", "file", "rgba")
 # Specify PAL resolution 1:1 pixel Aspect ratio
 ri.Format(720,576,1)
 # ri.Format(1080,720,1)
@@ -644,7 +649,7 @@ ri.WorldBegin()
 
 # Camera transformation
 ri.Translate(0,-1.5,0)
-ri.Translate(0,0,20)
+ri.Translate(0,0,10)
 ri.Rotate(-20,1,0,0)
 
 # Lighting
@@ -660,8 +665,8 @@ ri.AttributeEnd()
 ri.TransformEnd()
 
 Table()
-MultipleMugs()
-# Mug()
+# MultipleMugs()
+Mug()
 
 ri.WorldEnd()
 ri.End()
