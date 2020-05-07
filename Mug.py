@@ -462,7 +462,7 @@ def Mug(height=4.5, radius=2):
 		'string expression' : [scratch]
 	})
 
-	ri.Pattern('scratch', 'scratch', {'color Cin': [1.0,1.0,1.0]})
+	ri.Pattern('smudge', 'smudge', {'color Cin': [1.0,1.0,1.0]})
 
 	# ri.Displace('PxrDisplace', 'displaceTexture',
 	# {   
@@ -470,13 +470,12 @@ def Mug(height=4.5, radius=2):
 	# 	'uniform float dispAmount' : [0.001],
 	# })
 	ri.Bxdf('PxrSurface', 'plastic',{
-		# 'reference color diffuseColor' : ['seColorVariance:resultRGB'],
-		'reference color diffuseColor' : ['scratch:Cout'],
+		'reference color diffuseColor' : ['seColorVariance:resultRGB'],
 		# 'reference color diffuseColor' : ['seScratch:resultRGB'],
 		# 'reference color diffuseColor' : ['seTexture:resultRGB'],
 		'color clearcoatFaceColor' : [.1, .1, .1], 
 		'color clearcoatEdgeColor' : [.1, .1, .1],
-		'float clearcoatRoughness' : 0.01,
+		'reference float clearcoatRoughness' : ['smudge:mag'],
 		'float clearcoatThickness' : 1,
 	})
 
@@ -631,8 +630,8 @@ ri.Integrator ('PxrPathTracer' ,'integrator')
 ri.Attribute('displacementbound', {'float sphere' : [1], ri.COORDINATESYSTEM:"object"})
 ri.Option('searchpath', {'string texture':'./textures/:@'})
 ri.Hider('raytrace' ,{'int incremental' :[1]})
-ri.ShadingRate(10)
-ri.PixelVariance(1.0)
+ri.ShadingRate(0.1)
+ri.PixelVariance(0.001)
 # ArchiveRecord is used to add elements to the rib stream in this case comments
 # now we add the display element using the usual elements
 # FILENAME DISPLAY Type Output format
@@ -661,8 +660,8 @@ ri.AttributeEnd()
 ri.TransformEnd()
 
 Table()
-# MultipleMugs()
-Mug()
+MultipleMugs()
+# Mug()
 
 ri.WorldEnd()
 ri.End()

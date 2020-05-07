@@ -1,0 +1,21 @@
+surface smudge(
+    float s = 0 [[int lockgeom = 0]], // Use s attached to geo.
+    float t = 0 [[int lockgeom = 0]], // Use t attached to geo.
+    color Cin=1,
+    output color Cout=1,
+    output float mag=0
+)
+{
+    float u_repeat = 5;
+    float v_repeat = u_repeat/2;
+    float weight = 1.0;
+    mag = 0.0;
+    for(int i = 0; i < 6; ++i)
+    {
+        mag += abs((float)noise("perlin",s*u_repeat*weight,t*v_repeat*weight)/weight);
+        weight = (weight*2)+0.1;
+    }
+    mag/=4;
+    mag=clamp(mag, 0.0, 1.0);
+    Cout=mag*Cin;
+}
