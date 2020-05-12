@@ -2,6 +2,7 @@ surface logo(
     float s = 0 [[int lockgeom = 0]], // Use s attached to geo.
     float t = 0 [[int lockgeom = 0]], // Use t attached to geo.
     color Cin=1,
+    float chips=2,
     output color Cout=1,
     output float mag=0
 )
@@ -11,11 +12,13 @@ surface logo(
     float s_pos=0.7;
     float tex=texture("logo.tex",(3*s)-s_pos,((1-t)*t_scale)-t_pos);
 
-    mag=abs((float)noise("perlin",s*99,t*99));
-    mag+=abs((float)noise("perlin",s*9.5,t*9.5));
-    mag+=abs((float)noise("perlin",s*2.1,t*2.1));
-    mag=smoothstep(0.1,0.3,mag);
-    mag=min(mag,tex);
+    // mag=abs((float)noise("perlin",s*99,t*99));
+    // mag+=abs((float)noise("perlin",s*9.5,t*9.5));
+    // mag+=abs((float)noise("perlin",s*2.1,t*2.1));
+    // mag=smoothstep(0.1,0.3,mag);
+    float chips1=smoothstep(0.075,0.15,chips);
+    // mag=min(mag,chips1);
+    mag=min(chips1,tex);
 
     Cout=1-mag;
     mag=mag;

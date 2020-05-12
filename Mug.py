@@ -434,8 +434,18 @@ def Mug(height=4.5, radius=2):
 		'string expression' : [colorVarience]
 	})
 	ri.Pattern('smudge', 'smudge', {'color Cin': [1.0,1.0,1.0]})
-	ri.Pattern('scratch', 'scratch', {'color Cin': [0.15,0.15,0.15]})
-	ri.Pattern('logo', 'logo', {'color Cin': [1.0,1.0,1.0]})
+	ri.Pattern('logo', 'logo',
+		{
+			'color Cin': [1.0,1.0,1.0],
+			'reference float chips' : ['voronoise:resultF'],
+		}
+	)
+	ri.Pattern('scratch', 'scratch',
+		{
+			'color Cin': [0.15,0.15,0.15],
+			'reference color logo': ['logo:Cout']
+		}
+	)
 
 	# ri.Displace('PxrDisplace', 'displaceTexture',
 	# {   
@@ -444,12 +454,12 @@ def Mug(height=4.5, radius=2):
 	# })
 
 	ri.AttributeBegin()
-	# ri.Displace('PxrDisplace', 'displaceTexture',
-	# {   
-	# 	'reference float dispScalar' : ['logo:mag'],
-	# 	'uniform float dispAmount' : [0.005],
-	# })
-	# ri.Attribute("dice",{"float micropolygonlength":1}) # Smaller number reduces tearing.
+	ri.Displace('PxrDisplace', 'displaceTexture',
+	{   
+		'reference float dispScalar' : ['logo:mag'],
+		'uniform float dispAmount' : [0.005],
+	})
+	ri.Attribute("dice",{"float micropolygonlength":1}) # Smaller number reduces tearing.
 	ri.Bxdf('PxrSurface', 'plastic',{
 		# 'reference color diffuseColor' : ['seColorVariance:resultRGB'],
 		# 'reference color diffuseColor' : ['logo:Cout'],
@@ -633,7 +643,7 @@ else:
 
 ri.Declare("st","facevarying float[2]")
 
-ri.Attribute('displacementbound', {'float sphere' : [1], ri.COORDINATESYSTEM:"object"})
+ri.Attribute('displacementbound', {'float sphere' : [0.1], ri.COORDINATESYSTEM:"object"})
 ri.Option('searchpath', {'string texture':'./textures/:@'})
 ri.Hider('raytrace' ,{'int incremental' :[1]})
 
