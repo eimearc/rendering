@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import prman
 import math
+import argparse
 
 NUM_CYLINDER_VERTS=4
 
@@ -79,10 +80,6 @@ def distance(v1,v2):
 	return math.sqrt(x_dist**2 + y_dist**2 + z_dist**2)
 
 def getUVCoords(verts=None):
-	x_index = 0
-	y_index = 1
-	z_index = 2
-	u_step = 0.25
 	full_dist = 0.0
 	v1 = []
 	v2 = []
@@ -141,19 +138,11 @@ def getUVCoords(verts=None):
 	new_uvs.append([0.5,1.0])
 	new_uvs.append([0.75,1.0])
 
-	# length = len(new_uvs)
-	# new_uvs=[]
-	# for i in range(0,len(new_uvs)):
-	# 	new_uvs+=new_uvs[i]
-
 	uvs = []
 	for uv in new_uvs:
 		uvs+=uv
 
-	print(len(uvs))
-
 	return uvs
-
 
 def Cylinder(radius=2, height=4.5):
 	X_BASE=math.sqrt((radius*radius)/1.5)
@@ -307,16 +296,6 @@ def Cylinder(radius=2, height=4.5):
 	indices += [i+1,i,i+3,i+2]
 	nverts += [4]
 
-	print(len(indices), len(uvs))
-
-	for i in range(0,len(indices)):
-		print(i, indices[i], "-->", uvs[2*i],uvs[(2*i)+1])
-		pass
-
-	# updated_uvs = []
-	# for i in indices:
-	# 	updated_uvs += [uvs[2*i],uvs[(2*i)+1]]
-
 	num = len(verts_list)
 	tags = [ri.CREASE]*num
 	nargs = [NUM_CYLINDER_VERTS+1,1]*num
@@ -332,9 +311,9 @@ class Component():
 	intargs = []
 	floatargs = []
 	verts = []
-	voffset = []
+	uvs = []
 
-	def __init__(self, nverts, indices, tags, nargs, intargs, floatargs, verts, voffset):
+	def __init__(self, nverts, indices, tags, nargs, intargs, floatargs, verts, uvs):
 		self.nverts = nverts
 		self.indices = indices
 		self.tags = tags
@@ -342,13 +321,13 @@ class Component():
 		self.intargs = intargs
 		self.floatargs = floatargs
 		self.verts = verts
-		self.voffset = voffset
+		self.uvs = uvs
 
 	def draw(self):
-		print(len(self.indices), len(self.voffset))
-		# self.voffset=[0.1,0.1]*(len(self.verts)/3)
 		ri.SubdivisionMesh("catmull-clark",
-			self.nverts, self.indices, self.tags, self.nargs, self.intargs, self.floatargs, {ri.P: self.verts, ri.st: self.voffset})
+			self.nverts, self.indices, self.tags,
+			self.nargs, self.intargs, self.floatargs,
+			{ri.P: self.verts, 'facevarying float[2] st' : self.uvs})
 
 	def add(self, other):
 		self.nverts += other.nverts
@@ -359,19 +338,7 @@ class Component():
 		self.intargs += [i+start_index for i in other.intargs]
 		self.floatargs += other.floatargs
 		self.verts += other.verts
-		self.voffset += other.voffset
-
-def Bump():
-	expr="""
-	$colour = c1;
-	$c = floor( 10 * $s ) + floor( 10 * $t );
-	if( fmod( $c, 2.0 ) < 1.0 )
-	{
-		$colour=c2;
-	}
-	$colour
-	"""
-	return expr
+		self.uvs += other.uvs
 
 def MultipleCyliders():
 	height = 4.5
@@ -445,15 +412,6 @@ def Mug(height=4.5, radius=2):
 	ri = prman.Ri()
 	ri.AttributeBegin()
 	ri.Attribute( 'identifier',{ 'name' :'mug'})
-	# ri.Attribute('trace', {'int displacements' : [1]})
-
-	expr = Bump()
-	ri.Pattern( 'PxrSeExpr' ,'seTexture',
-	{
-		'float c1' : [1],
-		'float c2' : [0],
-		'string expression' : [expr]
-	})
 	
 	ri.Pattern('PxrVoronoise', 'voronoise',
 	{
@@ -475,31 +433,6 @@ def Mug(height=4.5, radius=2):
 		'float fraction' : [0.9], 
 		'string expression' : [colorVarience]
 	})
-
-	# Function: y = 2x;
-	scratch = """
-	$x = $P[0];
-	$y = $P[1];
-	$a = [1,0,0];
-	$b = [0,0,0];
-
-	$repeatcount=6; #0, 100;
-	$ss=$u+noise([$x,$y,0]*5)*0.5;
-	$tt=$v+noise([$x,$y,0]*5+[100,100,100])*0.5;
-	$cc=ccellnoise([$ss*$repeatcount,$tt*$repeatcount,0]);
-
-	$color=voronoi($P,5,1.0,0,8,2,0.5);
-	if ($y>=1.0)
-	{
-		$color=[hash(1.77),0.0,0.0];
-	}
-	$color
-	"""
-	ri.Pattern('PxrSeExpr', 'seScratch',
-	{
-		'string expression' : [scratch]
-	})
-
 	ri.Pattern('smudge', 'smudge', {'color Cin': [1.0,1.0,1.0]})
 	ri.Pattern('scratch', 'scratch', {'color Cin': [1.0,1.0,1.0]})
 	ri.Pattern('logo', 'logo', {'color Cin': [1.0,1.0,1.0]})
@@ -515,11 +448,9 @@ def Mug(height=4.5, radius=2):
 		# 'reference color diffuseColor' : ['scratch:Cout'],
 		'reference color diffuseColor' : ['logo:Cout'],
 		# 'reference color diffuseColor' : ['seScratch:resultRGB'],
-		# 'reference color diffuseColor' : ['seTexture:resultRGB'],
 		'color clearcoatFaceColor' : [.1, .1, .1], 
 		'color clearcoatEdgeColor' : [.1, .1, .1],
 		'reference float clearcoatRoughness' : ['smudge:mag'],
-		# 'float clearcoatRoughness' : 0.01,
 		'float clearcoatThickness' : 1,
 	})
 
@@ -528,8 +459,7 @@ def Mug(height=4.5, radius=2):
 	ri.TransformBegin()
 	ri.Rotate(-90,0,1,0)
 	ri.Translate(2.1,2.4,0)
-	handle = Handle(height=height/5)
-	# handle.draw()
+	Handle(height=height/5)
 	ri.TransformEnd()
 	ri.AttributeEnd()
 
@@ -650,57 +580,74 @@ def MultipleMugs():
 	ri.TransformEnd()
 
 	ri.TransformBegin()
-	ri.Translate(4,0,-2)
+	ri.Translate(4,0,0)
 	ri.Rotate(-20,0,1,0)
 	Mug()
 	ri.TransformEnd()
 
 	ri.TransformBegin()
-	ri.Translate(-6,1.5,-2)
+	ri.Translate(-6,1.5,2)
 	ri.Rotate(-110,0,1,0)
 	ri.Rotate(-110,1,0,0)
 	ri.Rotate(100,0,0,1)
 	Mug()
 	ri.TransformEnd()
 
-ri = prman.Ri() # create an instance of the RenderMan interface
+parser = argparse.ArgumentParser(description='Render a mug.')
+parser.add_argument('-d', dest='debug', action='store_true')
+parser.add_argument('-p', dest='prod', action='store_true')
+parser.add_argument('-f', dest='rib', action='store_true')
+parser.add_argument('-i', dest='image', action='store_true')
+args = parser.parse_args()
+
+ri = prman.Ri()
 ri.Option("rib", {"string asciistyle": "indented"})
 
 filename = "Mug.rib"
-# this is the begining of the rib archive generation we can only
-# make RI calls after this function else we get a core dump
-ri.Begin("__render") #filename)
-# ri.Begin(filename)
-# ri.Integrator('PxrPathTracer' ,'integrator')
-ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "st"}, {"normalCheck": 0})
+
+if args.rib:
+	ri.Begin(filename)
+else:
+	ri.Begin("__render")
+
+if args.debug:
+	ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "st"}, {"normalCheck": 0})
+else:
+	ri.Integrator('PxrPathTracer' ,'integrator')
 
 ri.Declare("st","facevarying float[2]")
 
 ri.Attribute('displacementbound', {'float sphere' : [1], ri.COORDINATESYSTEM:"object"})
 ri.Option('searchpath', {'string texture':'./textures/:@'})
 ri.Hider('raytrace' ,{'int incremental' :[1]})
-ri.ShadingRate(10)
-ri.PixelVariance(1)
-# ArchiveRecord is used to add elements to the rib stream in this case comments
-# now we add the display element using the usual elements
-# FILENAME DISPLAY Type Output format
-ri.Display("Mug.exr", "it", "rgba")
-# ri.Display("Mug.exr", "file", "rgba")
-# Specify PAL resolution 1:1 pixel Aspect ratio
-ri.Format(720,576,1)
-# ri.Format(1080,720,1)
-ri.Projection(ri.PERSPECTIVE,{ri.FOV:40}) 
+
+if args.prod:
+	ri.ShadingRate(0.1)
+	ri.PixelVariance(0.01)
+	ri.Format(1920,1080,1)
+else:
+	ri.ShadingRate(10)
+	ri.PixelVariance(1)
+	ri.Format(720,576,1)
+
+if args.image:
+	ri.Display("Mug.exr", "file", "rgba")
+else:
+	ri.Display("Mug.exr", "it", "rgba")
+	
+ri.Projection(ri.PERSPECTIVE,{ri.FOV:50}) 
 ri.WorldBegin()
 
 # Camera transformation
 ri.Translate(0,-1.5,0)
-ri.Translate(0,0,20)
+ri.Translate(0,0,10)
 ri.Rotate(-20,1,0,0)
 
 # Lighting
 ri.TransformBegin()
 ri.AttributeBegin()
 ri.Declare('domeLight' ,'string')
+ri.Translate(0,0,40)
 ri.Rotate(-90,1,0,0)
 ri.Rotate(100,0,0,1)
 ri.Light( 'PxrDomeLight', 'domeLight', { 
@@ -709,13 +656,8 @@ ri.Light( 'PxrDomeLight', 'domeLight', {
 ri.AttributeEnd()
 ri.TransformEnd()
 
-# Table()
-# MultipleMugs()
-c = Cylinder()
-c.draw()
-# Handle()
-# Mug()
-# MultipleCyliders()
+Table()
+MultipleMugs()
 
 ri.WorldEnd()
 ri.End()
