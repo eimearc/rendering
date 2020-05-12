@@ -434,7 +434,7 @@ def Mug(height=4.5, radius=2):
 		'string expression' : [colorVarience]
 	})
 	ri.Pattern('smudge', 'smudge', {'color Cin': [1.0,1.0,1.0]})
-	ri.Pattern('scratch', 'scratch', {'color Cin': [1.0,1.0,1.0]})
+	ri.Pattern('scratch', 'scratch', {'color Cin': [0.15,0.15,0.15]})
 	ri.Pattern('logo', 'logo', {'color Cin': [1.0,1.0,1.0]})
 
 	# ri.Displace('PxrDisplace', 'displaceTexture',
@@ -452,9 +452,8 @@ def Mug(height=4.5, radius=2):
 	# ri.Attribute("dice",{"float micropolygonlength":1}) # Smaller number reduces tearing.
 	ri.Bxdf('PxrSurface', 'plastic',{
 		# 'reference color diffuseColor' : ['seColorVariance:resultRGB'],
-		'reference color diffuseColor' : ['logo:Cout'],
-		# 'reference color diffuseColor' : ['scratch:Cout'],
 		# 'reference color diffuseColor' : ['logo:Cout'],
+		'reference color diffuseColor' : ['scratch:Cout'],
 		# 'reference color diffuseColor' : ['seScratch:resultRGB'],
 		'color clearcoatFaceColor' : [.1, .1, .1], 
 		'color clearcoatEdgeColor' : [.1, .1, .1],
