@@ -37,24 +37,24 @@ surface scratch(
     mask+=(float)noise("uperlin",PP);
     mask+=(float)noise("uperlin",PP*2.1)/2.1;
     mask=clamp(mask,0,1);
-    // mask=1-mask;
     mask=smoothstep(0.8,0.9,mask);
     scratches1=max(mask,scratches1);
-    // scratches1=mask;
 
     uv=rotate(uv, -40, vector(0,0,0), vector(0,1,1));
     _s=uv[0];
     _t=uv[1];
-    float scratches2=abs((float)noise("perlin",_s*0.1,_t*t_freq*2));
-    scratches2=smoothstep(0,0.007,scratches2);
-    mask=(float)noise("uperlin",s*2.1,t*3.5);
-    mask+=(float)noise("uperlin",s*4.1,t*5.2)*0.5;
-    mask*=1.5;
+    PP+=point(1,1,1);
+    float scratches2=abs((float)noise("perlin",_s*0.1,_t*t_freq*4));
+    scratches2=smoothstep(0.005,0.01,scratches2);
+    mask=(float)noise("uperlin",PP/2.1);
+    mask+=(float)noise("uperlin",PP);
+    mask+=(float)noise("uperlin",PP*3.5)/3.5;
     mask=clamp(mask,0,1);
+    mask=smoothstep(0.7,0.8,mask);
     scratches2=max(mask,scratches2);
 
-    // color c = min(scratches1,scratches2);
-    // c=min(scratches,c);
+    color c = min(scratches1,scratches2);
+    // c=min(spots,c);
     Cout=max(Cin,spots);
-    Cout=scratches1;
+    Cout=max(Cin,c);
 }
