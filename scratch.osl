@@ -21,20 +21,26 @@ surface scratch(
     mask=clamp(mask,0,1);
     float spots = max(mag,mask);
 
-    int t_freq = 20;
+    int t_freq = 10;
     mag=0;
     freq=1;
     point uv = point(s,t,0);
     uv=rotate(uv, 30, vector(0,0,0), vector(0,1,1));
     float _s=uv[0];
     float _t=uv[1];
+    _s*=100;
+    _t*=100;
     float scratches1=abs((float)noise("perlin",_s*0.1,_t*t_freq));
-    scratches1=smoothstep(0,0.007,scratches1);
-    mask=(float)noise("uperlin",s*3,t*3);
-    mask+=(float)noise("uperlin",s*4,t*4);
-    mask*=2;
+    scratches1=smoothstep(0.05,0.1,scratches1);
+    point PP = point(P);
+    mask=(float)noise("uperlin",PP/2);
+    mask+=(float)noise("uperlin",PP);
+    mask+=(float)noise("uperlin",PP*2.1)/2.1;
     mask=clamp(mask,0,1);
+    // mask=1-mask;
+    mask=smoothstep(0.8,0.9,mask);
     scratches1=max(mask,scratches1);
+    // scratches1=mask;
 
     uv=rotate(uv, -40, vector(0,0,0), vector(0,1,1));
     _s=uv[0];
@@ -50,4 +56,5 @@ surface scratch(
     // color c = min(scratches1,scratches2);
     // c=min(scratches,c);
     Cout=max(Cin,spots);
+    Cout=scratches1;
 }
