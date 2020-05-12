@@ -1,0 +1,16 @@
+surface logo(
+    float s = 0 [[int lockgeom = 0]], // Use s attached to geo.
+    float t = 0 [[int lockgeom = 0]], // Use t attached to geo.
+    color Cin=1,
+    output color Cout=1,
+    output float mag=0
+)
+{
+    float t_scale=2.8;
+    float t_pos=1.4;
+    float s_pos=1.0;
+    // Cout=texture("logo.tex",(3*s),((1-t)*5);
+    Cout=texture("logo.tex",(3*s)-s_pos,((1-t)*t_scale)-t_pos);
+    // Cout=texture("logo.tex",u,v);
+    Cout=1-Cout;
+}

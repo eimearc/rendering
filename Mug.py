@@ -464,6 +464,7 @@ def Mug(height=4.5, radius=2):
 
 	ri.Pattern('smudge', 'smudge', {'color Cin': [1.0,1.0,1.0]})
 	ri.Pattern('scratch', 'scratch', {'color Cin': [1.0,1.0,1.0]})
+	ri.Pattern('logo', 'logo', {'color Cin': [1.0,1.0,1.0]})
 
 	# ri.Displace('PxrDisplace', 'displaceTexture',
 	# {   
@@ -473,7 +474,8 @@ def Mug(height=4.5, radius=2):
 
 	ri.Bxdf('PxrSurface', 'plastic',{
 		# 'reference color diffuseColor' : ['seColorVariance:resultRGB'],
-		'reference color diffuseColor' : ['scratch:Cout'],
+		# 'reference color diffuseColor' : ['scratch:Cout'],
+		'reference color diffuseColor' : ['logo:Cout'],
 		# 'reference color diffuseColor' : ['seScratch:resultRGB'],
 		# 'reference color diffuseColor' : ['seTexture:resultRGB'],
 		'color clearcoatFaceColor' : [.1, .1, .1], 
@@ -649,7 +651,7 @@ ri.WorldBegin()
 
 # Camera transformation
 ri.Translate(0,-1.5,0)
-ri.Translate(0,0,10)
+ri.Translate(0,0,20)
 ri.Rotate(-20,1,0,0)
 
 # Lighting
@@ -665,8 +667,8 @@ ri.AttributeEnd()
 ri.TransformEnd()
 
 Table()
-# MultipleMugs()
-Mug()
+MultipleMugs()
+# Mug()
 
 ri.WorldEnd()
 ri.End()
