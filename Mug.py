@@ -93,13 +93,13 @@ def getUVCoords(verts=None):
 		v2 = [vb.verts[0],vb.verts[1],vb.verts[2]]
 		full_dist+=distance(v1,v2)
 
-	uvs=[
-		0.0,0.0,
-		0.25,0.0,
-		0.5,0.0,
-		0.75,0.0
-	]
-
+	uvs=[]
+	uvs.append([
+		[0.0,0.0],
+		[0.25,0.0],
+		[0.5,0.0],
+		[0.75,0.0]
+	])
 	distance_so_far = 0
 	for i in range(1,len(verts)-1):
 		va = verts[i]
@@ -108,22 +108,53 @@ def getUVCoords(verts=None):
 		v2 = [vb.verts[0],vb.verts[1],vb.verts[2]]
 		distance_so_far+=distance(v1,v2)
 		f = distance_so_far/full_dist
-		uvs += [0.0,f]
-		uvs += [0.25,f]
-		uvs += [0.5,f]
-		uvs += [0.75,f]
+		uvs.append([
+			[0.0,f],
+			[0.25,f],
+			[0.5,f],
+			[0.75,f]])
+	uvs.append([
+		[0.0,1.0],
+		[0.25,1.0],
+		[0.5,1.0],
+		[0.75,1.0]
+	])
 
-	uvs += [
-		0.0,1.0,
-		0.25,1.0,
-		0.5,1.0,
-		0.75,1.0
-	]
+	new_uvs=[]
+	new_uvs.append([0.0,0.0])
+	new_uvs.append([0.25,0.0])
+	new_uvs.append([0.5,0.0])
+	new_uvs.append([0.75,0.0])
+	for i in range(0,len(uvs)-1):
+		for j in range(0,3):
+			new_uvs.append(uvs[i][0+j])
+			new_uvs.append(uvs[i+1][0+j])
+			new_uvs.append(uvs[i+1][1+j])
+			new_uvs.append(uvs[i][1+j])
+		new_uvs.append(uvs[i][3])
+		new_uvs.append(uvs[i+1][3])
+		new_uvs.append([1.0,uvs[i+1][3][1]])
+		new_uvs.append([1.0,uvs[i][3][1]])
+
+	new_uvs.append([0.0,1.0])
+	new_uvs.append([0.25,1.0])
+	new_uvs.append([0.5,1.0])
+	new_uvs.append([0.75,1.0])
+
+	# length = len(new_uvs)
+	# new_uvs=[]
+	# for i in range(0,len(new_uvs)):
+	# 	new_uvs+=new_uvs[i]
+
+	uvs = []
+	for uv in new_uvs:
+		uvs+=uv
+
+	print(len(uvs))
 
 	return uvs
 
 
-		
 def Cylinder(radius=2, height=4.5):
 	X_BASE=math.sqrt((radius*radius)/1.5)
 	Z_BASE=X_BASE
@@ -276,9 +307,15 @@ def Cylinder(radius=2, height=4.5):
 	indices += [i+1,i,i+3,i+2]
 	nverts += [4]
 
-	updated_uvs = []
-	for i in indices:
-		updated_uvs += [uvs[2*i],uvs[(2*i)+1]]
+	print(len(indices), len(uvs))
+
+	for i in range(0,len(indices)):
+		print(i, indices[i], "-->", uvs[2*i],uvs[(2*i)+1])
+		pass
+
+	# updated_uvs = []
+	# for i in indices:
+	# 	updated_uvs += [uvs[2*i],uvs[(2*i)+1]]
 
 	num = len(verts_list)
 	tags = [ri.CREASE]*num
@@ -308,9 +345,10 @@ class Component():
 		self.voffset = voffset
 
 	def draw(self):
-		print(len(self.indices), len(self.voffset)/2)
+		print(len(self.indices), len(self.voffset))
+		# self.voffset=[0.1,0.1]*(len(self.verts)/3)
 		ri.SubdivisionMesh("catmull-clark",
-			self.nverts, self.indices, self.tags, self.nargs, self.intargs, self.floatargs, {ri.P: self.verts, ri.ST: self.voffset})
+			self.nverts, self.indices, self.tags, self.nargs, self.intargs, self.floatargs, {ri.P: self.verts, ri.st: self.voffset})
 
 	def add(self, other):
 		self.nverts += other.nverts
@@ -613,7 +651,7 @@ def MultipleMugs():
 
 	ri.TransformBegin()
 	ri.Translate(4,0,-2)
-	ri.Rotate(-10,0,1,0)
+	ri.Rotate(-20,0,1,0)
 	Mug()
 	ri.TransformEnd()
 
@@ -632,8 +670,11 @@ filename = "Mug.rib"
 # this is the begining of the rib archive generation we can only
 # make RI calls after this function else we get a core dump
 ri.Begin("__render") #filename)
-ri.Integrator('PxrPathTracer' ,'integrator')
-# ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "st"}, {"normalCheck": 0})
+# ri.Begin(filename)
+# ri.Integrator('PxrPathTracer' ,'integrator')
+ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "st"}, {"normalCheck": 0})
+
+ri.Declare("st","facevarying float[2]")
 
 ri.Attribute('displacementbound', {'float sphere' : [1], ri.COORDINATESYSTEM:"object"})
 ri.Option('searchpath', {'string texture':'./textures/:@'})
@@ -668,8 +709,11 @@ ri.Light( 'PxrDomeLight', 'domeLight', {
 ri.AttributeEnd()
 ri.TransformEnd()
 
-Table()
-MultipleMugs()
+# Table()
+# MultipleMugs()
+c = Cylinder()
+c.draw()
+# Handle()
 # Mug()
 # MultipleCyliders()
 
