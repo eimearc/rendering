@@ -443,24 +443,41 @@ def Mug(height=4.5, radius=2):
 	# 	'uniform float dispAmount' : [0.001],
 	# })
 
+	ri.AttributeBegin()
+	# ri.Displace('PxrDisplace', 'displaceTexture',
+	# {   
+	# 	'reference float dispScalar' : ['logo:mag'],
+	# 	'uniform float dispAmount' : [0.005],
+	# })
+	# ri.Attribute("dice",{"float micropolygonlength":1}) # Smaller number reduces tearing.
 	ri.Bxdf('PxrSurface', 'plastic',{
 		# 'reference color diffuseColor' : ['seColorVariance:resultRGB'],
-		# 'reference color diffuseColor' : ['scratch:Cout'],
 		'reference color diffuseColor' : ['logo:Cout'],
+		# 'reference color diffuseColor' : ['scratch:Cout'],
+		# 'reference color diffuseColor' : ['logo:Cout'],
 		# 'reference color diffuseColor' : ['seScratch:resultRGB'],
 		'color clearcoatFaceColor' : [.1, .1, .1], 
 		'color clearcoatEdgeColor' : [.1, .1, .1],
 		'reference float clearcoatRoughness' : ['smudge:mag'],
 		'float clearcoatThickness' : 1,
 	})
-
 	cylinder = Cylinder()
 	cylinder.draw()
+	ri.AttributeEnd()
+	ri.AttributeBegin()
 	ri.TransformBegin()
 	ri.Rotate(-90,0,1,0)
 	ri.Translate(2.1,2.4,0)
+	ri.Bxdf('PxrSurface', 'plastic',{
+		'reference color diffuseColor' : ['seColorVariance:resultRGB'],
+		'color clearcoatFaceColor' : [.1, .1, .1], 
+		'color clearcoatEdgeColor' : [.1, .1, .1],
+		'reference float clearcoatRoughness' : ['smudge:mag'],
+		'float clearcoatThickness' : 1,
+	})
 	Handle(height=height/5)
 	ri.TransformEnd()
+	ri.AttributeEnd()
 	ri.AttributeEnd()
 
 def HalfHandle(x,y,z,sharpness,thickness,sign=1,start_index=0,reverse=False,height=2):

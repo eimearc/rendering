@@ -9,6 +9,14 @@ surface logo(
     float t_scale=3.3;
     float t_pos=1.7;
     float s_pos=0.7;
-    Cout=texture("logo.tex",(3*s)-s_pos,((1-t)*t_scale)-t_pos);
-    Cout=1-Cout;
+    float tex=texture("logo.tex",(3*s)-s_pos,((1-t)*t_scale)-t_pos);
+
+    mag=abs((float)noise("perlin",s*99,t*99));
+    mag+=abs((float)noise("perlin",s*9.5,t*9.5));
+    mag+=abs((float)noise("perlin",s*2.1,t*2.1));
+    mag=smoothstep(0.1,0.3,mag);
+    mag=min(mag,tex);
+
+    Cout=1-mag;
+    mag=mag;
 }
