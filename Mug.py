@@ -488,6 +488,7 @@ def Mug(height=4.5, radius=2):
 	cylinder = Cylinder()
 	cylinder.draw()
 	ri.TransformBegin()
+	ri.Rotate(-90,0,1,0)
 	ri.Translate(2.1,2.4,0)
 	handle = Handle(height=height/5)
 	# handle.draw()
@@ -538,6 +539,7 @@ def HalfHandle(x,y,z,sharpness,thickness,sign=1,start_index=0,reverse=False,heig
 	return verts_list
 
 def Handle(width=1, height=2, center_y=0.5):
+
 	X_BASE=width
 	Y_BASE=height/2.0
 	Z_BASE=0.5
@@ -589,7 +591,6 @@ def Handle(width=1, height=2, center_y=0.5):
 	nfaces = len(indices)/4
 	nverts = [4]*nfaces
 	ri.SubdivisionMesh("catmull-clark", nverts, indices, tags, nargs, tmpedgeloops, floatargs, {ri.P: verts})
-
 	# return Component(nverts, indices, tags, nargs, tmpedgeloops, floatargs, verts)
 
 def MultipleHandles():
@@ -606,12 +607,13 @@ def MultipleHandles():
 def MultipleMugs():
 	ri.TransformBegin()
 	ri.Translate(-1,0,0)
+	ri.Rotate(90,0,1,0)
 	Mug()
 	ri.TransformEnd()
 
 	ri.TransformBegin()
 	ri.Translate(4,0,-2)
-	ri.Rotate(57,0,1,0)
+	ri.Rotate(-10,0,1,0)
 	Mug()
 	ri.TransformEnd()
 
@@ -669,6 +671,7 @@ ri.TransformEnd()
 Table()
 MultipleMugs()
 # Mug()
+# MultipleCyliders()
 
 ri.WorldEnd()
 ri.End()
