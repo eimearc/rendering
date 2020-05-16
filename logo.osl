@@ -12,14 +12,27 @@ surface logo(
     float s_pos=0.7;
     float tex=texture("logo.tex",(3*s)-s_pos,((1-t)*t_scale)-t_pos);
 
-    // mag=abs((float)noise("perlin",s*99,t*99));
-    // mag+=abs((float)noise("perlin",s*9.5,t*9.5));
-    // mag+=abs((float)noise("perlin",s*2.1,t*2.1));
-    // mag=smoothstep(0.1,0.3,mag);
-    float chips1=smoothstep(0.075,0.15,chips);
-    // mag=min(mag,chips1);
-    mag=min(chips1,tex);
+    float disp=tex;
+    disp+=1;
+    disp/=2.0;
 
-    Cout=1-mag;
-    mag=mag;
+    float fuzz=0.1;
+    float minimum=0.05;
+    float chips_color=smoothstep(minimum,minimum+fuzz,chips);
+    float chips_disp=chips_color;
+    chips_disp+=1;
+    chips_disp/=2.0;
+    disp=min(chips_disp,disp);
+    minimum=0.5;
+    chips_disp=smoothstep(minimum,minimum+fuzz,chips);
+    chips_disp/=4;
+    chips_disp+=0.75;
+    disp=min(chips_disp,disp);
+
+    Cout=1-min(chips_color,tex);
+
+    minimum=0.02;
+    float dents_disp=smoothstep(minimum,minimum+fuzz,chips);
+    disp=min(disp,dents_disp);
+    mag=disp;
 }

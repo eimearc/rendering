@@ -56,5 +56,6 @@ surface scratch(
     color c = min(scratches1,scratches2);
     c=min(spots,c);
     c=max(Cin,c);
-    Cout=min(c,logo); // TODO: Move to another shader file.
+
+    Cout=min(c,logo);
 }

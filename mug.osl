@@ -1,8 +1,10 @@
 surface mug(
-    color Cin=1,
-    output color Cout=1,
-    float scaleU=5,
-    float scaleV=5)
+    color variance=1,
+    color scratches=1,
+    color logo=1,
+    output color Cout=1
+)
 {
-    Cout=(float)noise("uperlin",u*scaleU,v*scaleV)*Cin;
+    Cout = min(variance, logo);
+    Cout = min(Cout, scratches);
 }

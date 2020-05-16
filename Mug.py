@@ -417,7 +417,7 @@ def Mug(height=4.5, radius=2):
 	{
 		'float jitter': [1.0],
 		'float smoothness': [0.0],
-		'float frequency': [40.0]
+		'float frequency': [15.0]
 	})
 
 	colorVarience = """
@@ -442,8 +442,16 @@ def Mug(height=4.5, radius=2):
 	)
 	ri.Pattern('scratch', 'scratch',
 		{
-			'color Cin': [0.15,0.15,0.15],
+			'color Cin': [0.25,0.25,0.25],
 			'reference color logo': ['logo:Cout']
+		}
+	)
+	ri.Pattern('mug', 'mug',
+		{
+			'color Cin': [0.15,0.15,0.15],
+			'reference color variance': ['seColorVariance:resultRGB'],
+			'reference color scratches': ['scratch:Cout'],
+			'reference color logo': ['logo:Cout'],
 		}
 	)
 
@@ -457,14 +465,12 @@ def Mug(height=4.5, radius=2):
 	ri.Displace('PxrDisplace', 'displaceTexture',
 	{   
 		'reference float dispScalar' : ['logo:mag'],
-		'uniform float dispAmount' : [0.005],
+		'uniform float dispAmount' : [0.01],
 	})
 	ri.Attribute("dice",{"float micropolygonlength":1}) # Smaller number reduces tearing.
 	ri.Bxdf('PxrSurface', 'plastic',{
-		# 'reference color diffuseColor' : ['seColorVariance:resultRGB'],
+		'reference color diffuseColor' : ['mug:Cout'],
 		# 'reference color diffuseColor' : ['logo:Cout'],
-		'reference color diffuseColor' : ['scratch:Cout'],
-		# 'reference color diffuseColor' : ['seScratch:resultRGB'],
 		'color clearcoatFaceColor' : [.1, .1, .1], 
 		'color clearcoatEdgeColor' : [.1, .1, .1],
 		'reference float clearcoatRoughness' : ['smudge:mag'],
@@ -554,8 +560,6 @@ def Handle(width=1, height=2, center_y=0.5):
 		verts_list.append(v)
 
 	verts = [val for sublist in verts_list for val in sublist.verts]
-
-	# TODO: Change this to take sharpness from edges.
 
 	tmpedgeloops = []
 	tmpnargs = []
@@ -700,7 +704,10 @@ ri.WorldBegin()
 
 # Camera transformation
 ri.Translate(0,-1.5,0)
-ri.Translate(0,0,10)
+if args.prod:
+	ri.Translate(0,0,10)
+else:
+	ri.Translate(0,0,5)
 ri.Rotate(-20,1,0,0)
 
 # Lighting
