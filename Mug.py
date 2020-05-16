@@ -673,7 +673,7 @@ else:
 
 ri.Declare("st","facevarying float[2]")
 
-ri.Attribute('displacementbound', {'float sphere' : [0.1], ri.COORDINATESYSTEM:"object"})
+ri.Attribute('displacementbound', {'float sphere' : [0.01], ri.COORDINATESYSTEM:"object"})
 ri.Option('searchpath', {'string texture':'./textures/:@'})
 ri.Hider('raytrace' ,{'int incremental' :[1]})
 
@@ -704,10 +704,7 @@ ri.WorldBegin()
 
 # Camera transformation
 ri.Translate(0,-1.5,0)
-if args.prod:
-	ri.Translate(0,0,10)
-else:
-	ri.Translate(0,0,5)
+ri.Translate(0,0,10)
 ri.Rotate(-20,1,0,0)
 
 # Lighting
@@ -724,10 +721,6 @@ ri.AttributeEnd()
 ri.TransformEnd()
 
 Table()
-# ri.TransformBegin()
-# ri.Translate(0,0,4)
-# MultipleMugs()
-# ri.TransformEnd()
 MultipleMugs()
 
 ri.WorldEnd()
