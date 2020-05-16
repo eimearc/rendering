@@ -12,7 +12,7 @@ surface scratch(
     float spots=(float)noise("uperlin",_s,_t);
     spots+=(float)noise("uperlin",_s*2.1,_t*2.1)/2.1;
     spots+=(float)noise("uperlin",_s*3.2,_t*3.2)/3.2;
-    float minimum=0.35;
+    float minimum=0.3;
     float fuzz=0.05;
     spots=smoothstep(minimum,minimum+fuzz,spots);
     Cout=max(spots,Cin);
@@ -32,7 +32,7 @@ surface scratch(
     _s=uv[0]*50;
     _t=uv[1]*90;
     float scratches2=(float)noise("uperlin",_s,_t);
-    minimum=0.045;
+    minimum=0.042;
     fuzz=0.05;
     scratches2=smoothstep(minimum,minimum+fuzz,scratches2);
     

@@ -442,7 +442,7 @@ def Mug(height=4.5, radius=2):
 	)
 	ri.Pattern('scratch', 'scratch',
 		{
-			'color Cin': [0.25,0.25,0.25],
+			'color Cin': [0.6,0.6,0.6],
 			'reference color logo': ['logo:Cout']
 		}
 	)
