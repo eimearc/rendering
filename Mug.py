@@ -664,11 +664,10 @@ else:
 	
 ri.Projection(ri.PERSPECTIVE,{ri.FOV:50})
 if args.dof:
-	FOCAL_LENGTH=0.5 # Area around subject to be in focus.
+	FOCAL_LENGTH=10 # Area around subject to be in focus.
 	FSTOP=FOCAL_LENGTH*2 # Lower number == more blur.
 	FOCAL_DISTANCE=8 # Distance to the subject to be in focus.
 	ri.DepthOfField(FSTOP,FOCAL_LENGTH,FOCAL_DISTANCE)
-# ri.Camera("camera",{ri.FOV: [50]})
 
 ri.Option( 'statistics', {'filename'  : [ 'stats.txt' ] } )
 
