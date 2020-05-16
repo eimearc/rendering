@@ -470,7 +470,6 @@ def Mug(height=4.5, radius=2):
 	ri.Attribute("dice",{"float micropolygonlength":1}) # Smaller number reduces tearing.
 	ri.Bxdf('PxrSurface', 'plastic',{
 		'reference color diffuseColor' : ['mug:Cout'],
-		# 'reference color diffuseColor' : ['logo:Cout'],
 		'color clearcoatFaceColor' : [.1, .1, .1], 
 		'color clearcoatEdgeColor' : [.1, .1, .1],
 		'reference float clearcoatRoughness' : ['smudge:mag'],
