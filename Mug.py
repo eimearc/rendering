@@ -624,6 +624,7 @@ parser.add_argument('-d', dest='debug', action='store_true')
 parser.add_argument('-p', dest='prod', action='store_true')
 parser.add_argument('-f', dest='rib', action='store_true')
 parser.add_argument('-i', dest='image', action='store_true')
+parser.add_argument('--dof', dest='dof', action='store_true')
 args = parser.parse_args()
 
 ri = prman.Ri()
@@ -637,7 +638,7 @@ else:
 	ri.Begin("__render")
 
 if args.debug:
-	ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "st"}, {"normalCheck": 0})
+	ri.Integrator("PxrVisualizer" ,"integrator", {"string style" : "shaded"}, {"normalCheck": 0})
 else:
 	ri.Integrator('PxrPathTracer' ,'integrator')
 
@@ -661,7 +662,16 @@ if args.image:
 else:
 	ri.Display("Mug.exr", "it", "rgba")
 	
-ri.Projection(ri.PERSPECTIVE,{ri.FOV:50}) 
+ri.Projection(ri.PERSPECTIVE,{ri.FOV:50})
+if args.dof:
+	FOCAL_LENGTH=0.5 # Area around subject to be in focus.
+	FSTOP=FOCAL_LENGTH*2 # Lower number == more blur.
+	FOCAL_DISTANCE=8 # Distance to the subject to be in focus.
+	ri.DepthOfField(FSTOP,FOCAL_LENGTH,FOCAL_DISTANCE)
+# ri.Camera("camera",{ri.FOV: [50]})
+
+ri.Option( 'statistics', {'filename'  : [ 'stats.txt' ] } )
+
 ri.WorldBegin()
 
 # Camera transformation
@@ -683,6 +693,10 @@ ri.AttributeEnd()
 ri.TransformEnd()
 
 Table()
+ri.TransformBegin()
+ri.Translate(0,0,4)
+MultipleMugs()
+ri.TransformEnd()
 MultipleMugs()
 
 ri.WorldEnd()
