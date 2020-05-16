@@ -499,16 +499,16 @@ def HalfHandle(x,y,z,sharpness,thickness,sign=1,start_index=0,reverse=False,heig
 	verts_list = []
 	i = start_index
 
-	x=X_BASE*0.45*-1
+	x=X_BASE*0.4*-1
 	y=(Y_BASE*0.8)*sign
 	z=Z_BASE*0.7
-	verts_list.append(HandleVerts(x,y,x-THICKNESS,y,z,-z,i,SHARPNESS,z_fan=1.05))
+	verts_list.append(HandleVerts(x,y,x-3*THICKNESS,y,z,-z,i,SHARPNESS,z_fan=1.2))
 	i += 1
 
 	x=X_BASE*0.5*-1
 	y=(Y_BASE+0.8*height)*sign
 	z=Z_BASE
-	verts_list.append(HandleVerts(x,y,x-2.6*THICKNESS,y+2.8*THICKNESS*sign,z,-z,i,SHARPNESS,z_fan=1.05))
+	verts_list.append(HandleVerts(x,y,x-2.6*THICKNESS,y+2.8*THICKNESS*sign,z,-z,i,SHARPNESS,z_fan=1.2))
 	i += 1
 
 	x=X_BASE*0.2
@@ -536,14 +536,14 @@ def Handle(width=1, height=2, center_y=0.5):
 
 	X_BASE=width
 	Y_BASE=height/2.0
-	Z_BASE=0.5
+	Z_BASE=0.3
 	SHARPNESS=0.0
 	THICKNESS=height/4.7
 
 	verts_list = HalfHandle(X_BASE, Y_BASE, Z_BASE, SHARPNESS, thickness=THICKNESS, height=height)
 
 	i = len(verts_list)
-	x=width*1.12
+	x=width
 	y=0
 	z=Z_BASE
 	verts_list.append(HandleVerts(x,y,x+THICKNESS,y,z,-z,i,SHARPNESS))
