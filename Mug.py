@@ -619,12 +619,37 @@ def MultipleMugs():
 	Mug()
 	ri.TransformEnd()
 
+def SetupAOVs():
+	# Beauty...
+	ri.DisplayChannel('color Ci')
+	ri.DisplayChannel('float a')
+	ri.DisplayChannel('color mse' , {'string source' : 'color Ci', 'string statistics' : 'mse' })
+	# Shading...
+	ri.DisplayChannel('color albedo',{ 'string source' : "color lpe:nothruput;noinfinitecheck;noclamp;unoccluded;overwrite;C<.S'passthru'>*((U2L)|O)"})
+	ri.DisplayChannel('color albedo_var',{ 'string source' : "color lpe:nothruput;noinfinitecheck;noclamp;unoccluded;overwrite;C<.S'passthru'>*((U2L)|O)" , 'string statistics' : 'variance' } )
+	ri.DisplayChannel( 'color diffuse',{ 'string source' : 'color lpe:C(D[DS]*[LO])|O' })
+	ri.DisplayChannel( 'color diffuse_mse',{ 'string source' : 'color lpe:C(D[DS]*[LO])|O', 'string statistics' : 'mse'})
+	ri.DisplayChannel( 'color specular',{ 'string source' : 'color lpe:CS[DS]*[LO]'})
+	ri.DisplayChannel( 'color specular_mse',{ 'string source' : 'color lpe:CS[DS]*[LO]' ,'string statistics' : 'mse'})
+	# Geometry...
+	ri.DisplayChannel( 'float z',{ 'string source' : 'float z' ,'string filter': 'gaussian'})
+	ri.DisplayChannel( 'float z_var',{ 'string source' : 'float z' ,'string filter' : 'gaussian' ,'string statistics': 'variance'})
+	ri.DisplayChannel( 'normal normal',{ 'string source' : 'normal Nn'})
+	ri.DisplayChannel( 'normal normal_var',{ 'string source' : 'normal Nn' ,'string statistics' : 'variance' })
+	ri.DisplayChannel( 'vector forward',{ 'string source'  : 'vector motionFore' })
+	ri.DisplayChannel( 'vector backward',{ 'string source' : 'vector motionBack' })
+	ri.Display(
+		'Denoise.exr',
+		'openexr',
+		'Ci,a,mse,albedo,albedo_var,diffuse,diffuse_mse,specular,specular_mse,z,z_var,normal,normal_var,forward,backward', { 'int asrgba' : [1]})
+
 parser = argparse.ArgumentParser(description='Render a mug.')
 parser.add_argument('-d', dest='debug', action='store_true')
 parser.add_argument('-p', dest='prod', action='store_true')
 parser.add_argument('-f', dest='rib', action='store_true')
 parser.add_argument('-i', dest='image', action='store_true')
 parser.add_argument('--dof', dest='dof', action='store_true')
+parser.add_argument('--denoise', dest='denoise', action='store_true')
 args = parser.parse_args()
 
 ri = prman.Ri()
@@ -659,6 +684,8 @@ else:
 
 if args.image:
 	ri.Display("Mug.exr", "file", "rgba")
+elif args.denoise:
+	SetupAOVs()
 else:
 	ri.Display("Mug.exr", "it", "rgba")
 	
@@ -668,8 +695,6 @@ if args.dof:
 	FSTOP=FOCAL_LENGTH*2 # Lower number == more blur.
 	FOCAL_DISTANCE=8 # Distance to the subject to be in focus.
 	ri.DepthOfField(FSTOP,FOCAL_LENGTH,FOCAL_DISTANCE)
-
-ri.Option( 'statistics', {'filename'  : [ 'stats.txt' ] } )
 
 ri.WorldBegin()
 
@@ -692,10 +717,10 @@ ri.AttributeEnd()
 ri.TransformEnd()
 
 Table()
-ri.TransformBegin()
-ri.Translate(0,0,4)
-MultipleMugs()
-ri.TransformEnd()
+# ri.TransformBegin()
+# ri.Translate(0,0,4)
+# MultipleMugs()
+# ri.TransformEnd()
 MultipleMugs()
 
 ri.WorldEnd()
